@@ -72,27 +72,6 @@ func (p *podSpeccer) FileLocation() ks.FileLocation {
 	return ks.FileLocation{}
 }
 
-// func shouldSkip(meta metav1.ObjectMeta) bool {
-// 	// type annotations struct {
-// 	// 	Skip bool `yaml:"kube-score/skip"`
-// 	// }
-// 	// var annotations
-// 	// if err != nil {
-// 	//     log.Fatal("Failed to unmarshall config.yaml:", err)
-// 	// }
-// 	//    config, err = setDefaults(config)
-// 	skip := false
-// 	// fmt.Printf("skip? %v\n\n", meta.Annotations)
-// 	if skipAnnotation, ok := meta.Annotations["kube-score/skip"]; ok {
-// 		// fmt.Printf("skip? %v\n\n", skipAnnotation)
-// 		if err := yaml.Unmarshal([]byte(skipAnnotation), &skip); err != nil {
-// 			// TODO: warning
-// 			// fmt.Printf("err? %v\n\n", err)
-// 		}
-// 	}
-// 	return skip
-// }
-
 // Score runs a pre-configured list of tests against the files defined in the configuration, and returns a scorecard.
 // Additional configuration and tuning parameters can be provided via the config.
 func Score(allObjects ks.AllTypes, allChecks *checks.Checks, cnf *config.RunConfiguration) (*scorecard.Scorecard, error) {
@@ -111,10 +90,6 @@ func Score(allObjects ks.AllTypes, allChecks *checks.Checks, cnf *config.RunConf
 	}
 
 	for _, ingress := range allObjects.Ingresses() {
-		// if shouldSkip(ingress.GetObjectMeta()) {
-		// 	fmt.Printf("skipping %v\n\n", ingress.GetObjectMeta().Name)
-		// 	continue
-		// }
 		o := newObject(ingress.GetTypeMeta(), ingress.GetObjectMeta())
 		for _, test := range allChecks.Ingresses() {
 			fn, err := test.Fn(ingress)
@@ -126,10 +101,6 @@ func Score(allObjects ks.AllTypes, allChecks *checks.Checks, cnf *config.RunConf
 	}
 
 	for _, meta := range allObjects.Metas() {
-		// if shouldSkip(meta.ObjectMeta) {
-		// 	fmt.Printf("skipping %v\n\n", meta.ObjectMeta.Name)
-		// 	continue
-		// }
 		o := newObject(meta.TypeMeta, meta.ObjectMeta)
 		for _, test := range allChecks.Metas() {
 			fn, err := test.Fn(meta)
@@ -141,11 +112,6 @@ func Score(allObjects ks.AllTypes, allChecks *checks.Checks, cnf *config.RunConf
 	}
 
 	for _, pod := range allObjects.Pods() {
-		// if shouldSkip(pod.Pod().ObjectMeta) {
-		// 	fmt.Printf("skipping %v\n\n", pod.Pod().ObjectMeta.Name)
-		// 	continue
-		// }
-
 		o := newObject(pod.Pod().TypeMeta, pod.Pod().ObjectMeta)
 		for _, test := range allChecks.Pods() {
 
@@ -164,11 +130,6 @@ func Score(allObjects ks.AllTypes, allChecks *checks.Checks, cnf *config.RunConf
 	}
 
 	for _, podspecer := range allObjects.PodSpeccers() {
-		// if shouldSkip(podspecer.GetObjectMeta()) {
-		// 	fmt.Printf("skipping %v\n\n", podspecer.GetObjectMeta().Name)
-		// 	continue
-		// }
-
 		o := newObject(podspecer.GetTypeMeta(), podspecer.GetObjectMeta())
 		for _, test := range allChecks.Pods() {
 			score, _ := test.Fn(podspecer)
@@ -180,11 +141,6 @@ func Score(allObjects ks.AllTypes, allChecks *checks.Checks, cnf *config.RunConf
 	}
 
 	for _, service := range allObjects.Services() {
-		// if shouldSkip(service.Service().ObjectMeta) {
-		// 	fmt.Printf("skipping %v\n\n", service.Service().ObjectMeta.Name)
-		// 	continue
-		// }
-
 		o := newObject(service.Service().TypeMeta, service.Service().ObjectMeta)
 		for _, test := range allChecks.Services() {
 			fn, err := test.Fn(service.Service())
@@ -196,11 +152,6 @@ func Score(allObjects ks.AllTypes, allChecks *checks.Checks, cnf *config.RunConf
 	}
 
 	for _, statefulset := range allObjects.StatefulSets() {
-		// if shouldSkip(statefulset.StatefulSet().ObjectMeta) {
-		// 	fmt.Printf("skipping %v\n\n", statefulset.StatefulSet().ObjectMeta.Name)
-		// 	continue
-		// }
-
 		o := newObject(statefulset.StatefulSet().TypeMeta, statefulset.StatefulSet().ObjectMeta)
 		for _, test := range allChecks.StatefulSets() {
 			fn, err := test.Fn(statefulset.StatefulSet())
@@ -212,11 +163,6 @@ func Score(allObjects ks.AllTypes, allChecks *checks.Checks, cnf *config.RunConf
 	}
 
 	for _, deployment := range allObjects.Deployments() {
-		// if shouldSkip(deployment.Deployment().ObjectMeta) {
-		// 	fmt.Printf("skipping %v\n\n", deployment.Deployment().ObjectMeta.Name)
-		// 	continue
-		// }
-
 		o := newObject(deployment.Deployment().TypeMeta, deployment.Deployment().ObjectMeta)
 		for _, test := range allChecks.Deployments() {
 			res, err := test.Fn(deployment.Deployment())
