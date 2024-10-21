@@ -29,18 +29,9 @@ func containerSecurityContextReadOnlyRootFilesystem(options Options) func(ps ks.
 		var allContainers []corev1.Container
 		if !options.SkipInitContainers {
 			allContainers = append(allContainers, ps.GetPodTemplateSpec().Spec.InitContainers...)
-			// for _, initContainer := range ps.GetPodTemplateSpec().Spec.InitContainers {
-			// 	allContainers = append(allContainers, Container{
-			// 		Container:       initContainer,
-			// 		IsInitContainer: true,
-			// 	})
-			// }
 
 		}
 		allContainers = append(allContainers, ps.GetPodTemplateSpec().Spec.Containers...)
-		// for _, container := range ps.GetPodTemplateSpec().Spec.Containers {
-		// allContainers = append(allContainers, Container{Container: container, IsInitContainer: false})
-		// }
 
 		noContextSet := false
 		hasWritableRootFS := false
