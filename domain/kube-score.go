@@ -39,6 +39,7 @@ type BothMeta struct {
 
 type PodSpecer interface {
 	FileLocationer
+	// SkipInitContainers() bool
 	GetTypeMeta() metav1.TypeMeta
 	GetObjectMeta() metav1.ObjectMeta
 	GetPodTemplateSpec() corev1.PodTemplateSpec
