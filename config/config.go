@@ -8,6 +8,7 @@ import (
 )
 
 type RunConfiguration struct {
+	SkipInitContainers                    bool
 	IgnoreContainerCpuLimitRequirement    bool
 	IgnoreContainerMemoryLimitRequirement bool
 	EnabledOptionalTests                  map[string]struct{}

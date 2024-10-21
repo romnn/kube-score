@@ -31,16 +31,24 @@ func RegisterAllChecks(allObjects ks.AllTypes, checksConfig *checks.Config, runC
 	deployment.Register(allChecks, allObjects)
 	ingress.Register(allChecks, allObjects)
 	cronjob.Register(allChecks)
-	container.Register(allChecks, runConfig.IgnoreContainerCpuLimitRequirement, runConfig.IgnoreContainerMemoryLimitRequirement)
+	container.Register(allChecks, container.Options{
+		SkipInitContainers:                    runConfig.SkipInitContainers,
+		IgnoreContainerCpuLimitRequirement:    runConfig.IgnoreContainerCpuLimitRequirement,
+		IgnoreContainerMemoryLimitRequirement: runConfig.IgnoreContainerMemoryLimitRequirement,
+	})
 	disruptionbudget.Register(allChecks, allObjects)
 	networkpolicy.Register(allChecks, allObjects, allObjects, allObjects)
 	probes.Register(allChecks, allObjects)
-	security.Register(allChecks)
+	security.Register(allChecks, security.Options{
+		SkipInitContainers: runConfig.SkipInitContainers,
+	})
 	service.Register(allChecks, allObjects, allObjects)
 	stable.Register(runConfig.KubernetesVersion, allChecks)
 	apps.Register(allChecks, allObjects.HorizontalPodAutoscalers(), allObjects.Services())
 	meta.Register(allChecks)
-	hpa.Register(allChecks, allObjects.Metas())
+	hpa.Register(allChecks, hpa.Options{
+		AllTargetableObjs: allObjects.Metas(),
+	})
 	podtopologyspreadconstraints.Register(allChecks)
 
 	return allChecks
