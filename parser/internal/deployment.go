@@ -14,7 +14,6 @@ import (
 type Appsv1Deployment struct {
 	Obj      appsv1.Deployment
 	Location ks.FileLocation
-	// InitContainers bool
 }
 
 func (d Appsv1Deployment) FileLocation() ks.FileLocation {
@@ -29,10 +28,6 @@ func (d Appsv1Deployment) GetObjectMeta() metav1.ObjectMeta {
 	return d.Obj.ObjectMeta
 }
 
-// func (d Appsv1Deployment) SkipInitContainers() bool {
-// 	return d.InitContainers
-// }
-
 func (d Appsv1Deployment) GetPodTemplateSpec() corev1.PodTemplateSpec {
 	d.Obj.Spec.Template.ObjectMeta.Namespace = d.Obj.ObjectMeta.Namespace
 	return d.Obj.Spec.Template
@@ -45,7 +40,6 @@ func (d Appsv1Deployment) Deployment() appsv1.Deployment {
 type Appsv1beta1Deployment struct {
 	appsv1beta1.Deployment
 	Location ks.FileLocation
-	// InitContainers bool
 }
 
 func (d Appsv1beta1Deployment) FileLocation() ks.FileLocation {
@@ -60,10 +54,6 @@ func (d Appsv1beta1Deployment) GetObjectMeta() metav1.ObjectMeta {
 	return d.ObjectMeta
 }
 
-// func (d Appsv1beta1Deployment) SkipInitContainers() bool {
-// 	return d.InitContainers
-// }
-
 func (d Appsv1beta1Deployment) GetPodTemplateSpec() corev1.PodTemplateSpec {
 	d.Spec.Template.ObjectMeta.Namespace = d.ObjectMeta.Namespace
 	return d.Spec.Template
@@ -72,7 +62,6 @@ func (d Appsv1beta1Deployment) GetPodTemplateSpec() corev1.PodTemplateSpec {
 type Appsv1beta2Deployment struct {
 	appsv1beta2.Deployment
 	Location ks.FileLocation
-	// InitContainers bool
 }
 
 func (d Appsv1beta2Deployment) FileLocation() ks.FileLocation {
@@ -87,10 +76,6 @@ func (d Appsv1beta2Deployment) GetObjectMeta() metav1.ObjectMeta {
 	return d.ObjectMeta
 }
 
-// func (d Appsv1beta2Deployment) SkipInitContainers() bool {
-// 	return d.InitContainers
-// }
-
 func (d Appsv1beta2Deployment) GetPodTemplateSpec() corev1.PodTemplateSpec {
 	d.Spec.Template.ObjectMeta.Namespace = d.ObjectMeta.Namespace
 	return d.Spec.Template
@@ -99,7 +84,6 @@ func (d Appsv1beta2Deployment) GetPodTemplateSpec() corev1.PodTemplateSpec {
 type Extensionsv1beta1Deployment struct {
 	extensionsv1beta1.Deployment
 	Location ks.FileLocation
-	// InitContainers bool
 }
 
 func (d Extensionsv1beta1Deployment) FileLocation() ks.FileLocation {
@@ -109,10 +93,6 @@ func (d Extensionsv1beta1Deployment) FileLocation() ks.FileLocation {
 func (d Extensionsv1beta1Deployment) GetTypeMeta() metav1.TypeMeta {
 	return d.TypeMeta
 }
-
-// func (d Extensionsv1beta1Deployment) SkipInitContainers() bool {
-// 	return d.InitContainers
-// }
 
 func (d Extensionsv1beta1Deployment) GetObjectMeta() metav1.ObjectMeta {
 	return d.ObjectMeta
