@@ -1,8 +1,6 @@
 package networkpolicy
 
 import (
-	"fmt"
-
 	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -12,31 +10,46 @@ import (
 	"github.com/zegl/kube-score/scorecard"
 )
 
-func Register(allChecks *checks.Checks, netpols ks.NetworkPolicies, pods ks.Pods, podspecers ks.PodSpeccers) {
-	allChecks.RegisterPodCheck("Pod NetworkPolicy", `Makes sure that all Pods are targeted by a NetworkPolicy`, podHasNetworkPolicy(netpols.NetworkPolicies()))
-	allChecks.RegisterNetworkPolicyCheck("NetworkPolicy targets Pod", `Makes sure that all NetworkPolicies targets at least one Pod`, networkPolicyTargetsPod(pods.Pods(), podspecers.PodSpeccers()))
+type Options struct {
+	Namespace string
+}
+
+func Register(allChecks *checks.Checks, netpols ks.NetworkPolicies, pods ks.Pods, podspecers ks.PodSpeccers, options Options) {
+	allChecks.RegisterPodCheck("Pod NetworkPolicy", `Makes sure that all Pods are targeted by a NetworkPolicy`, podHasNetworkPolicy(netpols.NetworkPolicies(), options))
+	allChecks.RegisterNetworkPolicyCheck("NetworkPolicy targets Pod", `Makes sure that all NetworkPolicies targets at least one Pod`, networkPolicyTargetsPod(pods.Pods(), podspecers.PodSpeccers(), options))
 }
 
 // podHasNetworkPolicy returns a function that tests that all pods have matching NetworkPolicies
 // podHasNetworkPolicy takes a list of all defined NetworkPolicies as input
-func podHasNetworkPolicy(allNetpols []ks.NetworkPolicy) func(ks.PodSpecer) (scorecard.TestScore, error) {
+func podHasNetworkPolicy(allNetpols []ks.NetworkPolicy, options Options) func(ks.PodSpecer) (scorecard.TestScore, error) {
 	return func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 		hasMatchingEgressNetpol := false
 		hasMatchingIngressNetpol := false
 
+		podNamespace := ps.GetPodTemplateSpec().Namespace
+		if podNamespace == "" {
+			podNamespace = options.Namespace
+		}
+
 		for _, n := range allNetpols {
 			netPol := n.NetworkPolicy()
 
-			fmt.Printf(
-				"policy=%s/%s pod=%s/%s\n",
-				netPol.Namespace,
-				netPol.Name,
-				ps.GetPodTemplateSpec().Namespace,
-				ps.GetPodTemplateSpec().Name,
-			)
+			netPolNamespace := netPol.Namespace
+
+			if netPolNamespace == "" {
+				netPolNamespace = options.Namespace
+			}
+
+			// fmt.Printf(
+			// 	"policyNamespace=%s/%s podNamespace=%s/%s\n",
+			// 	netPolNamespace,
+			// 	netPol.Name,
+			// 	podNamespace,
+			// 	ps.GetPodTemplateSpec().Name,
+			// )
 
 			// Make sure that the pod and networkpolicy is in the same namespace
-			if ps.GetPodTemplateSpec().Namespace != netPol.Namespace {
+			if podNamespace != netPolNamespace {
 				continue
 			}
 
@@ -92,20 +105,31 @@ func podHasNetworkPolicy(allNetpols []ks.NetworkPolicy) func(ks.PodSpecer) (scor
 	}
 }
 
-func networkPolicyTargetsPod(pods []ks.Pod, podspecers []ks.PodSpecer) func(networkingv1.NetworkPolicy) (scorecard.TestScore, error) {
+func networkPolicyTargetsPod(pods []ks.Pod, podspecers []ks.PodSpecer, options Options) func(networkingv1.NetworkPolicy) (scorecard.TestScore, error) {
 	return func(netpol networkingv1.NetworkPolicy) (score scorecard.TestScore, err error) {
 		hasMatch := false
 
+		netPolNamespace := netpol.Namespace
+		if netPolNamespace == "" {
+			netPolNamespace = options.Namespace
+		}
+
 		for _, p := range pods {
 			pod := p.Pod()
-			fmt.Printf(
-				"policy=%s/%s pod=%s/%s\n",
-				netpol.Namespace,
-				netpol.Name,
-				pod.Namespace,
-				pod.Name,
-			)
-			if pod.Namespace != netpol.Namespace {
+			podNamespace := pod.Namespace
+
+			if podNamespace == "" {
+				podNamespace = options.Namespace
+			}
+
+			// fmt.Printf(
+			// 	"policyNamespace=%s/%s podNamespace=%s/%s\n",
+			// 	netPolNamespace,
+			// 	netpol.Name,
+			// 	podNamespace,
+			// 	pod.Name,
+			// )
+			if podNamespace != netPolNamespace {
 				continue
 			}
 
@@ -119,7 +143,7 @@ func networkPolicyTargetsPod(pods []ks.Pod, podspecers []ks.PodSpecer) func(netw
 
 		if !hasMatch {
 			for _, pod := range podspecers {
-				if pod.GetObjectMeta().Namespace != netpol.Namespace {
+				if pod.GetObjectMeta().Namespace != netPolNamespace {
 					continue
 				}
 

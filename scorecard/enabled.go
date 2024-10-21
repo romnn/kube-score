@@ -13,10 +13,10 @@ func (so *ScoredObject) isEnabled(check ks.Check, annotations, childAnnotations 
 		if checkAnnotation, ok := annotations[fmt.Sprintf("kube-score/%s", check.ID)]; ok {
 			switch strings.TrimSpace(strings.ToLower(checkAnnotation)) {
 			case "allow", "allowed", "enable", "enabled", "yes":
-				fmt.Printf("enabling check %s\n", check.ID)
+				// fmt.Printf("enabling check %s\n", check.ID)
 				return true
 			case "deny", "denied", "disable", "disabled", "no":
-				fmt.Printf("disabling check %s\n", check.ID)
+				// fmt.Printf("disabling check %s\n", check.ID)
 				return false
 			}
 		}
