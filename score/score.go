@@ -38,7 +38,9 @@ func RegisterAllChecks(allObjects ks.AllTypes, checksConfig *checks.Config, runC
 	})
 	disruptionbudget.Register(allChecks, allObjects)
 	networkpolicy.Register(allChecks, allObjects, allObjects, allObjects)
-	probes.Register(allChecks, allObjects)
+	probes.Register(allChecks, allObjects, probes.Options{
+		SkipInitContainers: runConfig.SkipInitContainers,
+	})
 	security.Register(allChecks, security.Options{
 		SkipInitContainers: runConfig.SkipInitContainers,
 	})
