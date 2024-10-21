@@ -101,6 +101,7 @@ Actions:
 func scoreFiles(binName string, args []string) error {
 	fs := flag.NewFlagSet(binName, flag.ExitOnError)
 	exitOneOnWarning := fs.Bool("exit-one-on-warning", false, "Exit with code 1 in case of warnings")
+	skipInitContainers := fs.Bool("ignore-init-containers", false, "Ignores checks for init containers")
 	ignoreContainerCpuLimit := fs.Bool("ignore-container-cpu-limit", false, "Disables the requirement of setting a container CPU limit")
 	ignoreContainerMemoryLimit := fs.Bool("ignore-container-memory-limit", false, "Disables the requirement of setting a container memory limit")
 	verboseOutput := fs.CountP("verbose", "v", "Enable verbose output, can be set multiple times for increased verbosity.")
@@ -193,6 +194,7 @@ Use "-" as filename to read from STDIN.`, execName(binName))
 	}
 
 	runConfig := &config.RunConfiguration{
+		SkipInitContainers:                    *skipInitContainers,
 		IgnoreContainerCpuLimitRequirement:    *ignoreContainerCpuLimit,
 		IgnoreContainerMemoryLimitRequirement: *ignoreContainerMemoryLimit,
 		EnabledOptionalTests:                  enabledOptionalTests,

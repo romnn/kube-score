@@ -8,8 +8,12 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func Register(allChecks *checks.Checks, services ks.Services) {
-	allChecks.RegisterPodCheck("Pod Probes", `Makes sure that all Pods have safe probe configurations`, containerProbes(services.Services()))
+type Options struct {
+	SkipInitContainers bool
+}
+
+func Register(allChecks *checks.Checks, services ks.Services, options Options) {
+	allChecks.RegisterPodCheck("Pod Probes", `Makes sure that all Pods have safe probe configurations`, containerProbes(services.Services(), options))
 }
 
 // containerProbes returns a function that checks if all probes are defined correctly in the Pod.
@@ -17,7 +21,7 @@ func Register(allChecks *checks.Checks, services ks.Services) {
 // ReadinessProbes are not required if the pod is not targeted by a Service.
 //
 // containerProbes takes a slice of all defined Services as input.
-func containerProbes(allServices []ks.Service) func(ks.PodSpecer) (scorecard.TestScore, error) {
+func containerProbes(allServices []ks.Service, options Options) func(ks.PodSpecer) (scorecard.TestScore, error) {
 	return func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 		typeMeta := ps.GetTypeMeta()
 		if typeMeta.Kind == "CronJob" && typeMeta.GroupVersionKind().Group == "batch" || typeMeta.Kind == "Job" && typeMeta.GroupVersionKind().Group == "batch" {
@@ -26,7 +30,10 @@ func containerProbes(allServices []ks.Service) func(ks.PodSpecer) (scorecard.Tes
 		}
 
 		podTemplate := ps.GetPodTemplateSpec()
-		allContainers := podTemplate.Spec.InitContainers
+		var allContainers []corev1.Container
+		if !options.SkipInitContainers {
+			allContainers = append(allContainers, podTemplate.Spec.InitContainers...)
+		}
 		allContainers = append(allContainers, podTemplate.Spec.Containers...)
 
 		hasReadinessProbe := false

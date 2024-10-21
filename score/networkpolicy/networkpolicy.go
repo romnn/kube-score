@@ -1,6 +1,8 @@
 package networkpolicy
 
 import (
+	"fmt"
+
 	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -24,6 +26,14 @@ func podHasNetworkPolicy(allNetpols []ks.NetworkPolicy) func(ks.PodSpecer) (scor
 
 		for _, n := range allNetpols {
 			netPol := n.NetworkPolicy()
+
+			fmt.Printf(
+				"policy=%s/%s pod=%s/%s\n",
+				netPol.Namespace,
+				netPol.Name,
+				ps.GetPodTemplateSpec().Namespace,
+				ps.GetPodTemplateSpec().Name,
+			)
 
 			// Make sure that the pod and networkpolicy is in the same namespace
 			if ps.GetPodTemplateSpec().Namespace != netPol.Namespace {
@@ -88,6 +98,13 @@ func networkPolicyTargetsPod(pods []ks.Pod, podspecers []ks.PodSpecer) func(netw
 
 		for _, p := range pods {
 			pod := p.Pod()
+			fmt.Printf(
+				"policy=%s/%s pod=%s/%s\n",
+				netpol.Namespace,
+				netpol.Name,
+				pod.Namespace,
+				pod.Name,
+			)
 			if pod.Namespace != netpol.Namespace {
 				continue
 			}

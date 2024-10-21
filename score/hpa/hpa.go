@@ -7,16 +7,28 @@ import (
 	"k8s.io/utils/ptr"
 )
 
-func Register(allChecks *checks.Checks, allTargetableObjs []domain.BothMeta) {
-	allChecks.RegisterHorizontalPodAutoscalerCheck("HorizontalPodAutoscaler has target", `Makes sure that the HPA targets a valid object`, hpaHasTarget(allTargetableObjs))
-	allChecks.RegisterHorizontalPodAutoscalerCheck("HorizontalPodAutoscaler Replicas", `Makes sure that the HPA has multiple replicas`, hpaHasMultipleReplicas())
+type Options struct {
+	AllTargetableObjs []domain.BothMeta
 }
 
-func hpaHasTarget(allTargetableObjs []domain.BothMeta) func(hpa domain.HpaTargeter) (scorecard.TestScore, error) {
+func Register(allChecks *checks.Checks, options Options) {
+	allChecks.RegisterHorizontalPodAutoscalerCheck(
+		"HorizontalPodAutoscaler has target",
+		`Makes sure that the HPA targets a valid object`,
+		hpaHasTarget(options),
+	)
+	allChecks.RegisterHorizontalPodAutoscalerCheck(
+		"HorizontalPodAutoscaler Replicas",
+		`Makes sure that the HPA has multiple replicas`,
+		hpaHasMultipleReplicas(options),
+	)
+}
+
+func hpaHasTarget(options Options) func(hpa domain.HpaTargeter) (score scorecard.TestScore, err error) {
 	return func(hpa domain.HpaTargeter) (score scorecard.TestScore, err error) {
 		targetRef := hpa.HpaTarget()
 		var hasTarget bool
-		for _, t := range allTargetableObjs {
+		for _, t := range options.AllTargetableObjs {
 			if t.TypeMeta.APIVersion == targetRef.APIVersion &&
 				t.TypeMeta.Kind == targetRef.Kind &&
 				t.ObjectMeta.Name == targetRef.Name &&
@@ -36,7 +48,7 @@ func hpaHasTarget(allTargetableObjs []domain.BothMeta) func(hpa domain.HpaTarget
 	}
 }
 
-func hpaHasMultipleReplicas() func(hpa domain.HpaTargeter) (scorecard.TestScore, error) {
+func hpaHasMultipleReplicas(options Options) func(hpa domain.HpaTargeter) (score scorecard.TestScore, err error) {
 	return func(hpa domain.HpaTargeter) (score scorecard.TestScore, err error) {
 		if ptr.Deref(hpa.MinReplicas(), 1) >= 2 {
 			score.Grade = scorecard.GradeAllOK
