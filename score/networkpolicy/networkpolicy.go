@@ -167,6 +167,9 @@ func networkPolicyTargetsPod(pods []ks.Pod, podspecers []ks.PodSpecer, options O
 			}
 
 			if selector, err := metav1.LabelSelectorAsSelector(&netpol.Spec.PodSelector); err == nil {
+				if verbose {
+					fmt.Printf("policy/%s => checking %s (%s) against selector=%s\n", netpol.Name, pod.Name, pod.Labels, selector.String())
+				}
 				if selector.Matches(internal.MapLabels(pod.Labels)) {
 					if verbose {
 						fmt.Printf("policy/%s => LABEL match\n", netpol.Name)
@@ -193,6 +196,12 @@ func networkPolicyTargetsPod(pods []ks.Pod, podspecers []ks.PodSpecer, options O
 				}
 
 				if selector, err := metav1.LabelSelectorAsSelector(&netpol.Spec.PodSelector); err == nil {
+					if verbose {
+						fmt.Printf(
+							"policy/%s => checking %s (%s) against selector=%s\n",
+							netpol.Name, pod.GetPodTemplateSpec().Name, pod.GetPodTemplateSpec().Labels, selector.String(),
+						)
+					}
 					if selector.Matches(internal.MapLabels(pod.GetPodTemplateSpec().Labels)) {
 						if verbose {
 							fmt.Printf("policy/%s => LABEL match\n", netpol.Name)
