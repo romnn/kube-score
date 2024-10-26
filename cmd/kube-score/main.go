@@ -176,18 +176,10 @@ Use "-" as filename to read from STDIN.`, execName(binName))
 		return errors.New("Invalid argument combination. --all-default-optional and --ignore-tests cannot be used together")
 	}
 
-	if *allDefaultOptional {
-		var addOptionalChecks []string
-		for _, c := range score.RegisterAllChecks(parser.Empty(), nil, nil).All() {
-			if c.Optional {
-				addOptionalChecks = append(addOptionalChecks, c.ID)
-			}
-		}
-		optionalTests = &addOptionalChecks
-	}
-
 	ignoredTests := listToStructMap(ignoreTests)
 	enabledOptionalTests := listToStructMap(optionalTests)
+
+	checkConfig := checks.Config{IgnoredTests: ignoredTests}
 
 	kubeVer, err := config.ParseSemver(*kubernetesVersion)
 	if err != nil {
@@ -205,6 +197,16 @@ Use "-" as filename to read from STDIN.`, execName(binName))
 		KubernetesVersion:                     kubeVer,
 	}
 
+	if *allDefaultOptional {
+		var addOptionalChecks []string
+		for _, c := range score.RegisterAllChecks(parser.Empty(), &checkConfig, runConfig).All() {
+			if c.Optional {
+				addOptionalChecks = append(addOptionalChecks, c.ID)
+			}
+		}
+		optionalTests = &addOptionalChecks
+	}
+
 	p, err := parser.New(&parser.Config{
 		VerboseOutput: *verboseOutput,
 	})
@@ -217,7 +219,7 @@ Use "-" as filename to read from STDIN.`, execName(binName))
 		return fmt.Errorf("failed to parse files: %w", err)
 	}
 
-	checks := score.RegisterAllChecks(parsedFiles, &checks.Config{IgnoredTests: ignoredTests}, runConfig)
+	checks := score.RegisterAllChecks(parsedFiles, &checkConfig, runConfig)
 
 	scoreCard, err := score.Score(parsedFiles, checks, runConfig)
 	if err != nil {
