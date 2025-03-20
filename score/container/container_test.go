@@ -37,7 +37,8 @@ func (p *podSpeccer) FileLocation() ks.FileLocation {
 
 func TestOkAllTheSameContainerResourceRequestsEqualLimits(t *testing.T) {
 	t.Parallel()
-	s, _ := containerResourceRequestsEqualLimits(
+	check := containerResourceRequestsEqualLimits(Options{})
+	s, _ := check(
 		&podSpeccer{
 			spec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
@@ -67,7 +68,8 @@ func TestOkAllTheSameContainerResourceRequestsEqualLimits(t *testing.T) {
 
 func TestOkMultipleContainersContainerResourceRequestsEqualLimits(t *testing.T) {
 	t.Parallel()
-	s, _ := containerResourceRequestsEqualLimits(
+	check := containerResourceRequestsEqualLimits(Options{})
+	s, _ := check(
 		&podSpeccer{
 			spec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
@@ -125,7 +127,8 @@ func TestOkMultipleContainersContainerResourceRequestsEqualLimits(t *testing.T) 
 
 func TestOkSameQuantityContainerResourceRequestsEqualLimits(t *testing.T) {
 	t.Parallel()
-	s, _ := containerResourceRequestsEqualLimits(
+	check := containerResourceRequestsEqualLimits(Options{})
+	s, _ := check(
 		&podSpeccer{
 			spec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
@@ -155,7 +158,8 @@ func TestOkSameQuantityContainerResourceRequestsEqualLimits(t *testing.T) {
 
 func TestFailBothContainerResourceRequestsEqualLimits(t *testing.T) {
 	t.Parallel()
-	s, _ := containerResourceRequestsEqualLimits(
+	check := containerResourceRequestsEqualLimits(Options{})
+	s, _ := check(
 		&podSpeccer{
 			spec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
@@ -190,7 +194,8 @@ func TestFailBothContainerResourceRequestsEqualLimits(t *testing.T) {
 
 func TestFailCpuInitContainerResourceRequestsEqualLimits(t *testing.T) {
 	t.Parallel()
-	s, _ := containerResourceRequestsEqualLimits(
+	check := containerResourceRequestsEqualLimits(Options{})
+	s, _ := check(
 		&podSpeccer{
 			spec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
@@ -238,7 +243,8 @@ func TestFailCpuInitContainerResourceRequestsEqualLimits(t *testing.T) {
 
 func TestOkAllCPURequestsEqualLimits(t *testing.T) {
 	t.Parallel()
-	s, _ := containerCPURequestsEqualLimits(
+	check := containerCPURequestsEqualLimits(Options{})
+	s, _ := check(
 		&podSpeccer{
 			spec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
@@ -266,7 +272,8 @@ func TestOkAllCPURequestsEqualLimits(t *testing.T) {
 
 func TestOkMultipleContainersContainerCPURequestsEqualLimits(t *testing.T) {
 	t.Parallel()
-	s, _ := containerCPURequestsEqualLimits(
+	check := containerCPURequestsEqualLimits(Options{})
+	s, _ := check(
 		&podSpeccer{
 			spec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
@@ -318,7 +325,8 @@ func TestOkMultipleContainersContainerCPURequestsEqualLimits(t *testing.T) {
 
 func TestOkSameQuantityContainerCPURequestsEqualLimits(t *testing.T) {
 	t.Parallel()
-	s, _ := containerCPURequestsEqualLimits(
+	check := containerCPURequestsEqualLimits(Options{})
+	s, _ := check(
 		&podSpeccer{
 			spec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
@@ -346,7 +354,8 @@ func TestOkSameQuantityContainerCPURequestsEqualLimits(t *testing.T) {
 
 func TestFailContainerCPURequestsEqualLimits(t *testing.T) {
 	t.Parallel()
-	s, _ := containerCPURequestsEqualLimits(
+	check := containerCPURequestsEqualLimits(Options{})
+	s, _ := check(
 		&podSpeccer{
 			spec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
@@ -375,12 +384,12 @@ func TestFailContainerCPURequestsEqualLimits(t *testing.T) {
 	assert.Equal(t, "foo", s.Comments[0].Path)
 	assert.Equal(t, "CPU requests does not match limits", s.Comments[0].Summary)
 	assert.Equal(t, "Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.cpu == resources.limits.cpu", s.Comments[0].Description)
-
 }
 
 func TestFailInitContainerCPURequestsEqualLimits(t *testing.T) {
 	t.Parallel()
-	s, _ := containerCPURequestsEqualLimits(
+	check := containerCPURequestsEqualLimits(Options{})
+	s, _ := check(
 		&podSpeccer{
 			spec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
@@ -426,7 +435,8 @@ func TestFailInitContainerCPURequestsEqualLimits(t *testing.T) {
 
 func TestOkContainerMemoryResourceRequestsEqualLimits(t *testing.T) {
 	t.Parallel()
-	s, _ := containerMemoryRequestsEqualLimits(
+	check := containerMemoryRequestsEqualLimits(Options{})
+	s, _ := check(
 		&podSpeccer{
 			spec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
@@ -454,7 +464,8 @@ func TestOkContainerMemoryResourceRequestsEqualLimits(t *testing.T) {
 
 func TestOkMultipleContainersContainerMemoryRequestsEqualLimits(t *testing.T) {
 	t.Parallel()
-	s, _ := containerMemoryRequestsEqualLimits(
+	check := containerMemoryRequestsEqualLimits(Options{})
+	s, _ := check(
 		&podSpeccer{
 			spec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
@@ -506,7 +517,8 @@ func TestOkMultipleContainersContainerMemoryRequestsEqualLimits(t *testing.T) {
 
 func TestOkSameQuantityContainerMemoryRequestsEqualLimits(t *testing.T) {
 	t.Parallel()
-	s, _ := containerMemoryRequestsEqualLimits(
+	check := containerMemoryRequestsEqualLimits(Options{})
+	s, _ := check(
 		&podSpeccer{
 			spec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
@@ -534,7 +546,8 @@ func TestOkSameQuantityContainerMemoryRequestsEqualLimits(t *testing.T) {
 
 func TestFailContainerMemoryRequestsEqualLimits(t *testing.T) {
 	t.Parallel()
-	s, _ := containerMemoryRequestsEqualLimits(
+	check := containerMemoryRequestsEqualLimits(Options{})
+	s, _ := check(
 		&podSpeccer{
 			spec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
@@ -567,7 +580,8 @@ func TestFailContainerMemoryRequestsEqualLimits(t *testing.T) {
 
 func TestFailInitContainerMemoryRequestsEqualLimits(t *testing.T) {
 	t.Parallel()
-	s, _ := containerMemoryRequestsEqualLimits(
+	check := containerMemoryRequestsEqualLimits(Options{})
+	s, _ := check(
 		&podSpeccer{
 			spec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{

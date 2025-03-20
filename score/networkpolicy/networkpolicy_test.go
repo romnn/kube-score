@@ -101,7 +101,7 @@ func TestPodHasNetworkPolicy(t *testing.T) {
 			Spec: corev1.PodSpec{},
 		}
 
-		fn := podHasNetworkPolicy([]domain.NetworkPolicy{np{Obj: pol}})
+		fn := podHasNetworkPolicy([]domain.NetworkPolicy{np{Obj: pol}}, Options{})
 		spec := corev1.PodTemplateSpec{ObjectMeta: pod.ObjectMeta, Spec: pod.Spec}
 		score, _ := fn(&podSpeccer{spec: spec})
 		assert.Equal(t, tc.expected, score.Grade, "caseID = %d", caseID)

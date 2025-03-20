@@ -18,7 +18,6 @@ import (
 	"github.com/zegl/kube-score/renderer/ci"
 	"github.com/zegl/kube-score/renderer/human"
 	"github.com/zegl/kube-score/renderer/json_v2"
-	"github.com/zegl/kube-score/renderer/junit"
 	"github.com/zegl/kube-score/renderer/sarif"
 	"github.com/zegl/kube-score/score"
 	"github.com/zegl/kube-score/score/checks"
@@ -128,9 +127,9 @@ func scoreFiles(binName string, args []string) error {
 		return nil
 	}
 
-	if *outputFormat != "human" && *outputFormat != "ci" && *outputFormat != "json" && *outputFormat != "sarif" && *outputFormat != "junit" {
+	if *outputFormat != "human" && *outputFormat != "ci" && *outputFormat != "json" && *outputFormat != "sarif" {
 		fs.Usage()
-		return fmt.Errorf("Error: --output-format must be set to: 'human', 'json', 'sarif', 'junit' or 'ci'")
+		return fmt.Errorf("--output-format must be set to: 'human', 'json', 'sarif', or 'ci'")
 	}
 
 	acceptedColors := map[string]bool{
@@ -140,12 +139,12 @@ func scoreFiles(binName string, args []string) error {
 	}
 	if !acceptedColors[*color] {
 		fs.Usage()
-		return fmt.Errorf("Error: --color must be set to: 'auto', 'always' or 'never'")
+		return fmt.Errorf("--color must be set to: 'auto', 'always' or 'never'")
 	}
 
 	filesToRead := fs.Args()
 	if len(filesToRead) == 0 {
-		return fmt.Errorf(`Error: No files given as arguments.
+		return fmt.Errorf(`no files given as arguments.
 
 Usage: %s score [--flag1 --flag2] file1 file2 ...
 
@@ -173,7 +172,8 @@ Use "-" as filename to read from STDIN.`, execName(binName))
 	}
 
 	if len(*ignoreTests) > 0 && *allDefaultOptional {
-		return errors.New("Invalid argument combination. --all-default-optional and --ignore-tests cannot be used together")
+		// ROMAN: allow enable all and then ignore based on the order of arguments
+		// return errors.New("Invalid argument combination. --all-default-optional and --ignore-tests cannot be used together")
 	}
 
 	ignoredTests := listToStructMap(ignoreTests)
@@ -183,7 +183,7 @@ Use "-" as filename to read from STDIN.`, execName(binName))
 
 	kubeVer, err := config.ParseSemver(*kubernetesVersion)
 	if err != nil {
-		return errors.New("Invalid --kubernetes-version. Use on format \"vN.NN\"")
+		return errors.New("invalid --kubernetes-version. Use on format \"vN.NN\"")
 	}
 
 	runConfig := &config.RunConfiguration{
@@ -198,13 +198,13 @@ Use "-" as filename to read from STDIN.`, execName(binName))
 	}
 
 	if *allDefaultOptional {
-		var addOptionalChecks []string
 		for _, c := range score.RegisterAllChecks(parser.Empty(), &checkConfig, runConfig).All() {
 			if c.Optional {
-				addOptionalChecks = append(addOptionalChecks, c.ID)
+				if _, ok := ignoredTests[c.ID]; !ok {
+					enabledOptionalTests[c.ID] = struct{}{}
+				}
 			}
 		}
-		optionalTests = &addOptionalChecks
 	}
 
 	p, err := parser.New(&parser.Config{
@@ -262,8 +262,6 @@ Use "-" as filename to read from STDIN.`, execName(binName))
 		r = ci.CI(scoreCard)
 	case *outputFormat == "sarif":
 		r = sarif.Output(scoreCard)
-	case *outputFormat == "junit":
-		r = junit.JUnit(scoreCard)
 	default:
 		return fmt.Errorf("error: Unknown --output-format or --output-version")
 	}
