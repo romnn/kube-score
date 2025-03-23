@@ -10,6 +10,7 @@ import (
 
 type Options struct {
 	SkipInitContainers bool
+	Namespace          string
 }
 
 // Register registers the pod checks, including the new one for identical probes.
@@ -52,7 +53,7 @@ func containerProbes(
 
 		hasReadinessProbe := false
 		hasLivenessProbe := false
-		isTargetedByService := isTargetedByService(allServices, podTemplate)
+		isTargetedByService := isTargetedByService(allServices, podTemplate, options)
 
 		// Check probes for each container
 		for _, container := range allContainers {
@@ -180,17 +181,26 @@ func checkBasicProbes(container corev1.Container, hasReadinessProbe, hasLiveness
 }
 
 // isTargetedByService checks if the pod is targeted by any of the services.
-func isTargetedByService(allServices []ks.Service, podTemplate corev1.PodTemplateSpec) bool {
+func isTargetedByService(allServices []ks.Service, podTemplate corev1.PodTemplateSpec, options Options) bool {
 	for _, s := range allServices {
-		if podIsTargetedByService(podTemplate, s.Service()) {
+		if podIsTargetedByService(podTemplate, s.Service(), options) {
 			return true
 		}
 	}
 	return false
 }
 
-func podIsTargetedByService(pod corev1.PodTemplateSpec, service corev1.Service) bool {
-	if pod.Namespace != service.Namespace {
+func podIsTargetedByService(pod corev1.PodTemplateSpec, service corev1.Service, options Options) bool {
+	podNamespace := pod.Namespace
+	if podNamespace == "" {
+		podNamespace = options.Namespace
+	}
+	serviceNamespace := service.Namespace
+	if serviceNamespace == "" {
+		serviceNamespace = options.Namespace
+	}
+
+	if podNamespace != serviceNamespace {
 		return false
 	}
 

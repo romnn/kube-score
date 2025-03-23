@@ -21,7 +21,6 @@ func Register(allChecks *checks.Checks, options Options) {
 		"Container Resources",
 		`Makes sure that all pods have resource limits and requests set. The --ignore-container-cpu-limit flag can be used to disable the requirement of having a CPU limit`,
 		containerResources(options),
-		// containerResources,
 	)
 	allChecks.RegisterOptionalPodCheck(
 		"Container Resource Requests Equal Limits",

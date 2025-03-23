@@ -5,11 +5,11 @@ import (
 
 	ks "github.com/romnn/kube-score/domain"
 	"github.com/romnn/kube-score/score/checks"
-	"github.com/romnn/kube-score/score/internal"
 	"github.com/romnn/kube-score/scorecard"
 
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8slabels "k8s.io/apimachinery/pkg/labels"
 )
 
 type Options struct {
@@ -44,6 +44,7 @@ func hasMatching(
 	labels map[string]string,
 	options Options,
 ) (bool, string, error) {
+	verbose := false
 	var hasNamespaceMismatch []string
 
 	if namespace == "" {
@@ -58,15 +59,36 @@ func hasMatching(
 			return false, "", fmt.Errorf("failed to create selector: %w", err)
 		}
 
-		if !selector.Matches(internal.MapLabels(labels)) {
-			continue
-		}
-
-		// matches, but in different namespace
 		budgetNamespace := budget.Namespace()
 		if budgetNamespace == "" {
 			budgetNamespace = options.Namespace
 		}
+
+		// var requirements []k8slabels.Requirement
+		// for k, v := range labels {
+		// 	req, err := k8slabels.NewRequirement(k, k8sselection.Equals, []string{v})
+		// 	if err != nil {
+		// 		panic(err)
+		// 	}
+		// 	requirements = append(requirements, *req)
+		// }
+		// test := k8slabels.NewSelector().Add(requirements...)
+
+		if verbose {
+			fmt.Printf("selector = %+v\n", selector)
+			fmt.Printf("labels = %+v\n", k8slabels.Set(labels))
+			fmt.Printf(
+				"\t pdbNamespace = %q namespace=%q\n",
+				budgetNamespace,
+				namespace,
+			)
+			fmt.Printf("\t match = %t\n", selector.Matches(k8slabels.Set(labels)))
+		}
+		if !selector.Matches(k8slabels.Set(labels)) {
+			continue
+		}
+
+		// matches, but in different namespace
 		if budgetNamespace != namespace {
 			hasNamespaceMismatch = append(hasNamespaceMismatch, budgetNamespace)
 			continue

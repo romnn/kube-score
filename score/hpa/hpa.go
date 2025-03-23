@@ -2,6 +2,7 @@ package hpa
 
 import (
 	"fmt"
+
 	"github.com/romnn/kube-score/domain"
 	"github.com/romnn/kube-score/score/checks"
 	"github.com/romnn/kube-score/scorecard"
@@ -11,6 +12,7 @@ import (
 type Options struct {
 	AllTargetableObjs []domain.BothMeta
 	MinReplicas       int
+	Namespace         string
 }
 
 func Register(allChecks *checks.Checks, options Options) {
@@ -29,26 +31,50 @@ func Register(allChecks *checks.Checks, options Options) {
 func hpaHasTarget(
 	options Options,
 ) func(hpa domain.HpaTargeter) (score scorecard.TestScore, err error) {
-	return func(hpa domain.HpaTargeter) (score scorecard.TestScore, err error) {
+	verbose := false
+	return func(hpa domain.HpaTargeter) (scorecard.TestScore, error) {
 		targetRef := hpa.HpaTarget()
 		var hasTarget bool
 		for _, t := range options.AllTargetableObjs {
+
+			hpaNamespace := hpa.GetObjectMeta().Namespace
+			if hpaNamespace == "" {
+				hpaNamespace = options.Namespace
+			}
+
+			namespace := t.ObjectMeta.Namespace
+			if namespace == "" {
+				namespace = options.Namespace
+			}
+
+			if verbose {
+				fmt.Printf("hpa=%s\n", targetRef.Name)
+				fmt.Printf(
+					"\t apiVersion: %s == %s\n",
+					targetRef.APIVersion,
+					t.TypeMeta.APIVersion,
+				)
+				fmt.Printf("\t kind: %s == %s\n", targetRef.Kind, t.TypeMeta.Kind)
+				fmt.Printf("\t name: %s == %s\n", targetRef.Name, t.ObjectMeta.Name)
+				fmt.Printf("\t namespace: %s == %s\n", hpaNamespace, namespace)
+			}
 			if t.TypeMeta.APIVersion == targetRef.APIVersion &&
 				t.TypeMeta.Kind == targetRef.Kind &&
 				t.ObjectMeta.Name == targetRef.Name &&
-				t.ObjectMeta.Namespace == hpa.GetObjectMeta().Namespace {
+				namespace == hpaNamespace {
 				hasTarget = true
 				break
 			}
 		}
 
+		var score scorecard.TestScore
 		if hasTarget {
 			score.Grade = scorecard.GradeAllOK
 		} else {
 			score.Grade = scorecard.GradeCritical
 			score.AddComment("", "The HPA target does not match anything", "")
 		}
-		return
+		return score, nil
 	}
 }
 

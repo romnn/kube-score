@@ -11,38 +11,55 @@ import (
 	"k8s.io/utils/ptr"
 )
 
-func Register(allChecks *checks.Checks, all ks.AllTypes, minReplicas int) {
+type Options struct {
+	Namespace   string
+	MinReplicas int
+}
+
+func Register(allChecks *checks.Checks, all ks.AllTypes, options Options) {
 	allChecks.RegisterDeploymentCheck(
 		"Deployment Strategy",
 		`Makes sure that all Deployments targeted by service use RollingUpdate strategy`,
-		deploymentRolloutStrategy(all.Services()),
+		deploymentRolloutStrategy(all.Services(), options),
 	)
 	allChecks.RegisterDeploymentCheck(
 		"Deployment Replicas",
 		`Makes sure that Deployment has multiple replicas`,
-		deploymentReplicas(all.Services(), all.HorizontalPodAutoscalers(), minReplicas),
+		deploymentReplicas(all.Services(), all.HorizontalPodAutoscalers(), options),
 	)
 }
 
 // deploymentRolloutStrategy checks if a Deployment has the update strategy on RollingUpdate if targeted by a service
 func deploymentRolloutStrategy(
 	svcs []ks.Service,
+	options Options,
 ) func(deployment v1.Deployment) (scorecard.TestScore, error) {
 	svcsInNamespace := make(map[string][]map[string]string)
 	for _, s := range svcs {
 		svc := s.Service()
-		if _, ok := svcsInNamespace[svc.Namespace]; !ok {
-			svcsInNamespace[svc.Namespace] = []map[string]string{}
+		namespace := svc.Namespace
+		if namespace == "" {
+			namespace = options.Namespace
 		}
-		svcsInNamespace[svc.Namespace] = append(
-			svcsInNamespace[svc.Namespace],
+
+		if _, ok := svcsInNamespace[namespace]; !ok {
+			svcsInNamespace[namespace] = []map[string]string{}
+		}
+		svcsInNamespace[namespace] = append(
+			svcsInNamespace[namespace],
 			svc.Spec.Selector,
 		)
 	}
+
 	return func(deployment v1.Deployment) (score scorecard.TestScore, err error) {
 		referencedByService := false
 
-		for _, svcSelector := range svcsInNamespace[deployment.Namespace] {
+		deploymentNamespace := deployment.Namespace
+		if deploymentNamespace == "" {
+			deploymentNamespace = options.Namespace
+		}
+
+		for _, svcSelector := range svcsInNamespace[deploymentNamespace] {
 			if internal.LabelSelectorMatchesLabels(
 				svcSelector,
 				deployment.Spec.Template.Labels,
@@ -73,28 +90,39 @@ func deploymentRolloutStrategy(
 func deploymentReplicas(
 	svcs []ks.Service,
 	hpas []ks.HpaTargeter,
-	minReplicas int,
+	options Options,
 ) func(deployment v1.Deployment) (scorecard.TestScore, error) {
 	svcsInNamespace := make(map[string][]map[string]string)
 	for _, s := range svcs {
 		svc := s.Service()
-		if _, ok := svcsInNamespace[svc.Namespace]; !ok {
-			svcsInNamespace[svc.Namespace] = []map[string]string{}
+		namespace := svc.Namespace
+		if namespace == "" {
+			namespace = options.Namespace
 		}
-		svcsInNamespace[svc.Namespace] = append(
-			svcsInNamespace[svc.Namespace],
+		if _, ok := svcsInNamespace[namespace]; !ok {
+			svcsInNamespace[namespace] = []map[string]string{}
+		}
+		svcsInNamespace[namespace] = append(
+			svcsInNamespace[namespace],
 			svc.Spec.Selector,
 		)
 	}
+
 	hpasInNamespace := make(map[string][]autoscalingv1.CrossVersionObjectReference)
 	for _, hpa := range hpas {
 		hpaTarget := hpa.HpaTarget()
 		hpaMeta := hpa.GetObjectMeta()
-		if _, ok := hpasInNamespace[hpaMeta.Namespace]; !ok {
-			hpasInNamespace[hpaMeta.Namespace] = []autoscalingv1.CrossVersionObjectReference{}
+
+		hpaNamespace := hpaMeta.Namespace
+		if hpaNamespace == "" {
+			hpaNamespace = options.Namespace
 		}
-		hpasInNamespace[hpaMeta.Namespace] = append(
-			hpasInNamespace[hpaMeta.Namespace],
+
+		if _, ok := hpasInNamespace[hpaNamespace]; !ok {
+			hpasInNamespace[hpaNamespace] = []autoscalingv1.CrossVersionObjectReference{}
+		}
+		hpasInNamespace[hpaNamespace] = append(
+			hpasInNamespace[hpaNamespace],
 			hpaTarget,
 		)
 	}
@@ -103,7 +131,12 @@ func deploymentReplicas(
 		referencedByService := false
 		hasHPA := false
 
-		for _, svcSelector := range svcsInNamespace[deployment.Namespace] {
+		deploymentNamespace := deployment.Namespace
+		if deploymentNamespace == "" {
+			deploymentNamespace = options.Namespace
+		}
+
+		for _, svcSelector := range svcsInNamespace[deploymentNamespace] {
 			if internal.LabelSelectorMatchesLabels(
 				svcSelector,
 				deployment.Spec.Template.Labels,
@@ -113,7 +146,7 @@ func deploymentReplicas(
 			}
 		}
 
-		for _, hpaTarget := range hpasInNamespace[deployment.Namespace] {
+		for _, hpaTarget := range hpasInNamespace[deploymentNamespace] {
 			if deployment.APIVersion == hpaTarget.APIVersion &&
 				deployment.Kind == hpaTarget.Kind &&
 				deployment.Name == hpaTarget.Name {
@@ -138,11 +171,11 @@ func deploymentReplicas(
 				"",
 			)
 		default:
-			if ptr.Deref(deployment.Spec.Replicas, 1) >= int32(minReplicas) {
+			if ptr.Deref(deployment.Spec.Replicas, 1) >= int32(options.MinReplicas) {
 				score.Grade = scorecard.GradeAllOK
 			} else {
 				score.Grade = scorecard.GradeWarning
-				score.AddComment("", "Deployment few replicas", fmt.Sprintf("Deployments targeted by Services are recommended to have at least %d replicas to prevent unwanted downtime.", minReplicas))
+				score.AddComment("", "Deployment few replicas", fmt.Sprintf("Deployments targeted by Services are recommended to have at least %d replicas to prevent unwanted downtime.", options.MinReplicas))
 			}
 		}
 
