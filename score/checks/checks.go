@@ -88,7 +88,10 @@ func (c *Checks) RegisterMetaCheck(name, comment string, fn CheckFunc[ks.BothMet
 	reg(c, "all", name, comment, false, fn, c.metas)
 }
 
-func (c *Checks) RegisterOptionalMetaCheck(name, comment string, fn CheckFunc[ks.BothMeta]) {
+func (c *Checks) RegisterOptionalMetaCheck(
+	name, comment string,
+	fn CheckFunc[ks.BothMeta],
+) {
 	reg(c, "all", name, comment, true, fn, c.metas)
 }
 
@@ -96,7 +99,13 @@ func (c *Checks) Metas() map[string]GenCheck[ks.BothMeta] {
 	return c.metas
 }
 
-func reg[T any](c *Checks, targetType, name, comment string, optional bool, fn CheckFunc[T], mp map[string]GenCheck[T]) {
+func reg[T any](
+	c *Checks,
+	targetType, name, comment string,
+	optional bool,
+	fn CheckFunc[T],
+	mp map[string]GenCheck[T],
+) {
 	ch := NewCheck(name, targetType, comment, optional)
 	check := GenCheck[T]{Check: ch, Fn: fn}
 	c.all = append(c.all, check.Check)
@@ -110,7 +119,10 @@ func (c *Checks) RegisterPodCheck(name, comment string, fn CheckFunc[ks.PodSpece
 	reg(c, "Pod", name, comment, false, fn, c.pods)
 }
 
-func (c *Checks) RegisterOptionalPodCheck(name, comment string, fn CheckFunc[ks.PodSpecer]) {
+func (c *Checks) RegisterOptionalPodCheck(
+	name, comment string,
+	fn CheckFunc[ks.PodSpecer],
+) {
 	reg(c, "Pod", name, comment, true, fn, c.pods)
 }
 
@@ -118,12 +130,34 @@ func (c *Checks) Pods() map[string]GenCheck[ks.PodSpecer] {
 	return c.pods
 }
 
-func (c *Checks) RegisterHorizontalPodAutoscalerCheck(name, comment string, fn CheckFunc[ks.HpaTargeter]) {
-	reg(c, "HorizontalPodAutoscaler", name, comment, false, fn, c.horizontalPodAutoscalers)
+func (c *Checks) RegisterHorizontalPodAutoscalerCheck(
+	name, comment string,
+	fn CheckFunc[ks.HpaTargeter],
+) {
+	reg(
+		c,
+		"HorizontalPodAutoscaler",
+		name,
+		comment,
+		false,
+		fn,
+		c.horizontalPodAutoscalers,
+	)
 }
 
-func (c *Checks) RegisterOptionalHorizontalPodAutoscalerCheck(name, comment string, fn CheckFunc[ks.HpaTargeter]) {
-	reg(c, "HorizontalPodAutoscaler", name, comment, true, fn, c.horizontalPodAutoscalers)
+func (c *Checks) RegisterOptionalHorizontalPodAutoscalerCheck(
+	name, comment string,
+	fn CheckFunc[ks.HpaTargeter],
+) {
+	reg(
+		c,
+		"HorizontalPodAutoscaler",
+		name,
+		comment,
+		true,
+		fn,
+		c.horizontalPodAutoscalers,
+	)
 }
 
 func (c *Checks) HorizontalPodAutoscalers() map[string]GenCheck[ks.HpaTargeter] {
@@ -134,7 +168,10 @@ func (c *Checks) RegisterCronJobCheck(name, comment string, fn CheckFunc[ks.Cron
 	reg(c, "CronJob", name, comment, false, fn, c.cronjobs)
 }
 
-func (c *Checks) RegisterOptionalCronJobCheck(name, comment string, fn CheckFunc[ks.CronJob]) {
+func (c *Checks) RegisterOptionalCronJobCheck(
+	name, comment string,
+	fn CheckFunc[ks.CronJob],
+) {
 	reg(c, "CronJob", name, comment, true, fn, c.cronjobs)
 }
 
@@ -142,11 +179,17 @@ func (c *Checks) CronJobs() map[string]GenCheck[ks.CronJob] {
 	return c.cronjobs
 }
 
-func (c *Checks) RegisterStatefulSetCheck(name, comment string, fn CheckFunc[appsv1.StatefulSet]) {
+func (c *Checks) RegisterStatefulSetCheck(
+	name, comment string,
+	fn CheckFunc[appsv1.StatefulSet],
+) {
 	reg(c, "StatefulSet", name, comment, false, fn, c.statefulsets)
 }
 
-func (c *Checks) RegisterOptionalStatefulSetCheck(name, comment string, fn CheckFunc[appsv1.StatefulSet]) {
+func (c *Checks) RegisterOptionalStatefulSetCheck(
+	name, comment string,
+	fn CheckFunc[appsv1.StatefulSet],
+) {
 	reg(c, "StatefulSet", name, comment, true, fn, c.statefulsets)
 }
 
@@ -154,11 +197,17 @@ func (c *Checks) StatefulSets() map[string]GenCheck[appsv1.StatefulSet] {
 	return c.statefulsets
 }
 
-func (c *Checks) RegisterDeploymentCheck(name, comment string, fn CheckFunc[appsv1.Deployment]) {
+func (c *Checks) RegisterDeploymentCheck(
+	name, comment string,
+	fn CheckFunc[appsv1.Deployment],
+) {
 	reg(c, "Deployment", name, comment, false, fn, c.deployments)
 }
 
-func (c *Checks) RegisterOptionalDeploymentCheck(name, comment string, fn CheckFunc[appsv1.Deployment]) {
+func (c *Checks) RegisterOptionalDeploymentCheck(
+	name, comment string,
+	fn CheckFunc[appsv1.Deployment],
+) {
 	reg(c, "Deployment", name, comment, true, fn, c.deployments)
 }
 
@@ -170,7 +219,10 @@ func (c *Checks) RegisterIngressCheck(name, comment string, fn CheckFunc[ks.Ingr
 	reg(c, "Ingress", name, comment, false, fn, c.ingresses)
 }
 
-func (c *Checks) RegisterOptionalIngressCheck(name, comment string, fn CheckFunc[ks.Ingress]) {
+func (c *Checks) RegisterOptionalIngressCheck(
+	name, comment string,
+	fn CheckFunc[ks.Ingress],
+) {
 	reg(c, "Ingress", name, comment, true, fn, c.ingresses)
 }
 
@@ -178,11 +230,17 @@ func (c *Checks) Ingresses() map[string]GenCheck[ks.Ingress] {
 	return c.ingresses
 }
 
-func (c *Checks) RegisterNetworkPolicyCheck(name, comment string, fn CheckFunc[networkingv1.NetworkPolicy]) {
+func (c *Checks) RegisterNetworkPolicyCheck(
+	name, comment string,
+	fn CheckFunc[networkingv1.NetworkPolicy],
+) {
 	reg(c, "NetworkPolicy", name, comment, false, fn, c.networkpolicies)
 }
 
-func (c *Checks) RegisterOptionalNetworkPolicyCheck(name, comment string, fn CheckFunc[networkingv1.NetworkPolicy]) {
+func (c *Checks) RegisterOptionalNetworkPolicyCheck(
+	name, comment string,
+	fn CheckFunc[networkingv1.NetworkPolicy],
+) {
 	reg(c, "NetworkPolicy", name, comment, true, fn, c.networkpolicies)
 }
 
@@ -190,7 +248,10 @@ func (c *Checks) NetworkPolicies() map[string]GenCheck[networkingv1.NetworkPolic
 	return c.networkpolicies
 }
 
-func (c *Checks) RegisterPodDisruptionBudgetCheck(name, comment string, fn CheckFunc[ks.PodDisruptionBudget]) {
+func (c *Checks) RegisterPodDisruptionBudgetCheck(
+	name, comment string,
+	fn CheckFunc[ks.PodDisruptionBudget],
+) {
 	reg(c, "PodDisruptionBudget", name, comment, false, fn, c.poddisruptionbudgets)
 }
 
@@ -198,11 +259,17 @@ func (c *Checks) PodDisruptionBudgets() map[string]GenCheck[ks.PodDisruptionBudg
 	return c.poddisruptionbudgets
 }
 
-func (c *Checks) RegisterServiceCheck(name, comment string, fn CheckFunc[corev1.Service]) {
+func (c *Checks) RegisterServiceCheck(
+	name, comment string,
+	fn CheckFunc[corev1.Service],
+) {
 	reg(c, "Service", name, comment, false, fn, c.services)
 }
 
-func (c *Checks) RegisterOptionalServiceCheck(name, comment string, fn CheckFunc[corev1.Service]) {
+func (c *Checks) RegisterOptionalServiceCheck(
+	name, comment string,
+	fn CheckFunc[corev1.Service],
+) {
 	reg(c, "Service", name, comment, true, fn, c.services)
 }
 

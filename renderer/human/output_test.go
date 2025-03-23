@@ -99,7 +99,9 @@ func TestHumanOutputDefault(t *testing.T) {
 	assert.Nil(t, err)
 	all, err := io.ReadAll(r)
 	assert.Nil(t, err)
-	assert.Equal(t, `v1/Testing foo in foofoo                                                      🤔
+	assert.Equal(
+		t,
+		`v1/Testing foo in foofoo                                                      🤔
     [WARNING] test-warning-two-comments
         · a -> summary
             description
@@ -113,7 +115,9 @@ v1/Testing bar-no-namespace                                                   �
         · summary
             description
             More information: https://kube-score.com/whatever
-`, string(all))
+`,
+		string(all),
+	)
 }
 
 func TestHumanOutputVerbose1(t *testing.T) {
@@ -122,7 +126,9 @@ func TestHumanOutputVerbose1(t *testing.T) {
 	assert.Nil(t, err)
 	all, err := io.ReadAll(r)
 	assert.Nil(t, err)
-	assert.Equal(t, `v1/Testing foo in foofoo                                                      🤔
+	assert.Equal(
+		t,
+		`v1/Testing foo in foofoo                                                      🤔
     [WARNING] test-warning-two-comments
         · a -> summary
             description
@@ -142,7 +148,9 @@ v1/Testing bar-no-namespace                                                   �
     [OK] test-ok-comment
         · a -> summary
             description
-`, string(all))
+`,
+		string(all),
+	)
 }
 
 func TestHumanOutputVerbose2(t *testing.T) {
@@ -151,7 +159,9 @@ func TestHumanOutputVerbose2(t *testing.T) {
 	assert.Nil(t, err)
 	all, err := io.ReadAll(r)
 	assert.Nil(t, err)
-	assert.Equal(t, `v1/Testing foo in foofoo                                                      🤔
+	assert.Equal(
+		t,
+		`v1/Testing foo in foofoo                                                      🤔
     [WARNING] test-warning-two-comments
         · a -> summary
             description
@@ -179,7 +189,9 @@ v1/Testing bar-no-namespace                                                   �
         · a -> skipped sum
             skipped description
     [SKIPPED] test-skipped-no-comment
-`, string(all))
+`,
+		string(all),
+	)
 }
 
 func getTestCardAllOK() *scorecard.Scorecard {
@@ -269,9 +281,13 @@ func TestHumanOutputAllOKDefault(t *testing.T) {
 	assert.Nil(t, err)
 	all, err := io.ReadAll(r)
 	assert.Nil(t, err)
-	assert.Equal(t, `v1/Testing foo in foofoo                                                      ✅
+	assert.Equal(
+		t,
+		`v1/Testing foo in foofoo                                                      ✅
 v1/Testing bar-no-namespace                                                   ✅
-`, string(all))
+`,
+		string(all),
+	)
 }
 
 func getTestCardLongDescription() *scorecard.Scorecard {
@@ -312,14 +328,18 @@ func TestHumanOutputLogDescription120Width(t *testing.T) {
 	assert.Nil(t, err)
 	all, err := io.ReadAll(r)
 	assert.Nil(t, err)
-	assert.Equal(t, `v1/Testing foo in foofoo                                                      🤔
+	assert.Equal(
+		t,
+		`v1/Testing foo in foofoo                                                      🤔
     [WARNING] test-warning-two-comments
         · a -> summary
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras elementum sagittis lacus, a dictum tortor
             lobortis vel. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
             Nulla eu neque erat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;
             Maecenas et nisl venenatis, elementum augue a, porttitor libero.
-`, string(all))
+`,
+		string(all),
+	)
 }
 
 func TestHumanOutputLogDescription100Width(t *testing.T) {
@@ -328,7 +348,9 @@ func TestHumanOutputLogDescription100Width(t *testing.T) {
 	assert.Nil(t, err)
 	all, err := io.ReadAll(r)
 	assert.Nil(t, err)
-	assert.Equal(t, `v1/Testing foo in foofoo                                                      🤔
+	assert.Equal(
+		t,
+		`v1/Testing foo in foofoo                                                      🤔
     [WARNING] test-warning-two-comments
         · a -> summary
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras elementum sagittis lacus,
@@ -336,7 +358,9 @@ func TestHumanOutputLogDescription100Width(t *testing.T) {
             malesuada fames ac turpis egestas. Nulla eu neque erat. Vestibulum ante ipsum primis in
             faucibus orci luctus et ultrices posuere cubilia Curae; Maecenas et nisl venenatis,
             elementum augue a, porttitor libero.
-`, string(all))
+`,
+		string(all),
+	)
 }
 
 func TestHumanOutputLogDescription80Width(t *testing.T) {
@@ -345,7 +369,9 @@ func TestHumanOutputLogDescription80Width(t *testing.T) {
 	assert.Nil(t, err)
 	all, err := io.ReadAll(r)
 	assert.Nil(t, err)
-	assert.Equal(t, `v1/Testing foo in foofoo                                                      🤔
+	assert.Equal(
+		t,
+		`v1/Testing foo in foofoo                                                      🤔
     [WARNING] test-warning-two-comments
         · a -> summary
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras
@@ -354,7 +380,9 @@ func TestHumanOutputLogDescription80Width(t *testing.T) {
             turpis egestas. Nulla eu neque erat. Vestibulum ante ipsum primis in
             faucibus orci luctus et ultrices posuere cubilia Curae; Maecenas et
             nisl venenatis, elementum augue a, porttitor libero.
-`, string(all))
+`,
+		string(all),
+	)
 }
 
 func TestHumanOutputLogDescription0Width(t *testing.T) {
@@ -417,7 +445,9 @@ func TestHumanOutputWithLongObjectNames(t *testing.T) {
 	assert.Nil(t, err)
 	all, err := io.ReadAll(r)
 	assert.Nil(t, err)
-	assert.Equal(t, `v1/Testing this-is-a-very-long-title-this-is-a-very-long-title-this-is-a-very-long-title-this-is-a-very-long-title-this-is-a-very-long-title in foofoo🤔
+	assert.Equal(
+		t,
+		`v1/Testing this-is-a-very-long-title-this-is-a-very-long-title-this-is-a-very-long-title-this-is-a-very-long-title-this-is-a-very-long-title in foofoo🤔
     [WARNING] test-warning-two-comments
         · a -> summary
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras
@@ -426,5 +456,7 @@ func TestHumanOutputWithLongObjectNames(t *testing.T) {
             turpis egestas. Nulla eu neque erat. Vestibulum ante ipsum primis in
             faucibus orci luctus et ultrices posuere cubilia Curae; Maecenas et
             nisl venenatis, elementum augue a, porttitor libero.
-`, string(all))
+`,
+		string(all),
+	)
 }

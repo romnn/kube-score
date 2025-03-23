@@ -14,8 +14,16 @@ type Options struct {
 
 // Register registers the pod checks, including the new one for identical probes.
 func Register(allChecks *checks.Checks, services ks.Services, options Options) {
-	allChecks.RegisterPodCheck("Pod Probes", `Makes sure that all Pods have safe probe configurations`, containerProbes(services.Services(), options))
-	allChecks.RegisterPodCheck("Pod Probes Identical", `Container has the same readiness and liveness probe`, containerProbesIdentical(services.Services(), options))
+	allChecks.RegisterPodCheck(
+		"Pod Probes",
+		`Makes sure that all Pods have safe probe configurations`,
+		containerProbes(services.Services(), options),
+	)
+	allChecks.RegisterPodCheck(
+		"Pod Probes Identical",
+		`Container has the same readiness and liveness probe`,
+		containerProbesIdentical(services.Services(), options),
+	)
 }
 
 // containerProbes returns a function that checks if all probes are defined correctly in the Pod.
@@ -23,10 +31,14 @@ func Register(allChecks *checks.Checks, services ks.Services, options Options) {
 // ReadinessProbes are not required if the pod is not targeted by a Service.
 //
 // containerProbes takes a slice of all defined Services as input.
-func containerProbes(allServices []ks.Service, options Options) func(ks.PodSpecer) (scorecard.TestScore, error) {
+func containerProbes(
+	allServices []ks.Service,
+	options Options,
+) func(ks.PodSpecer) (scorecard.TestScore, error) {
 	return func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 		typeMeta := ps.GetTypeMeta()
-		if typeMeta.Kind == "CronJob" && typeMeta.GroupVersionKind().Group == "batch" || typeMeta.Kind == "Job" && typeMeta.GroupVersionKind().Group == "batch" {
+		if typeMeta.Kind == "CronJob" && typeMeta.GroupVersionKind().Group == "batch" ||
+			typeMeta.Kind == "Job" && typeMeta.GroupVersionKind().Group == "batch" {
 			score.Grade = scorecard.GradeAllOK
 			return score, nil
 		}
@@ -51,14 +63,20 @@ func containerProbes(allServices []ks.Service, options Options) func(ks.PodSpece
 		if !isTargetedByService {
 			score.Grade = scorecard.GradeAllOK
 			score.Skipped = true
-			score.AddComment("", "The pod is not targeted by a service, skipping probe checks.", "")
+			score.AddComment(
+				"",
+				"The pod is not targeted by a service, skipping probe checks.",
+				"",
+			)
 			return score, nil
 		}
 
 		// Evaluate probe checks
 		if !hasReadinessProbe {
 			score.Grade = scorecard.GradeCritical
-			score.AddCommentWithURL("", "Container is missing a readinessProbe",
+			score.AddCommentWithURL(
+				"",
+				"Container is missing a readinessProbe",
 				"A readinessProbe should be used to indicate when the service is ready to receive traffic. "+
 					"Without it, the Pod is risking to receive traffic before it has booted. "+
 					"It's also used during rollouts, and can prevent downtime if a new version of the application is failing.",
@@ -69,7 +87,9 @@ func containerProbes(allServices []ks.Service, options Options) func(ks.PodSpece
 
 		if !hasLivenessProbe {
 			score.Grade = scorecard.GradeAlmostOK
-			score.AddCommentWithURL("", "Container is missing a livenessProbe",
+			score.AddCommentWithURL(
+				"",
+				"Container is missing a livenessProbe",
 				"A livenessProbe can be used to restart the container if it's deadlocked or has crashed without exiting. "+
 					"It's only recommended to setup a livenessProbe if you really need one.",
 				"https://github.com/zegl/kube-score/blob/master/README_PROBES.md",

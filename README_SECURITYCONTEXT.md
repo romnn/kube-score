@@ -24,7 +24,7 @@ The checks that has container-security-context preformed has been split into thr
 * v1.12: Make `container-security-context` optional (opt-in), and make the three new checks run by default.
 * v1.13: Remove `container-security-context`.
 
-In v1.10, run kube-score with the following flags to ensure compatability with v1.12 and later:
+In v1.10, run kube-score with the following flags to ensure compatibility with v1.12 and later:
 
 ```bash
 kube-score score \
@@ -36,4 +36,4 @@ kube-score score \
 
 ----
 
-_Note:_ The "flip" and the deletion of the tests where originally scheduled to happen in v1.11 and v1.12. This did not happend, and the migration is now scheduled for v1.12 and v1.13 instead.
+_Note:_ The "flip" and the deletion of the tests where originally scheduled to happen in v1.11 and v1.12. This did not happen, and the migration is now scheduled for v1.12 and v1.13 instead.

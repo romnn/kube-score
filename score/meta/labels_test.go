@@ -25,7 +25,11 @@ func TestInvalidLabel(t *testing.T) {
 	assert.Len(t, s.Comments, 1)
 	assert.Equal(t, "foo", s.Comments[0].Path)
 	assert.Equal(t, "Invalid label value", s.Comments[0].Summary)
-	assert.Equal(t, "The label value is invalid, and will not be accepted by Kubernetes", s.Comments[0].Description)
+	assert.Equal(
+		t,
+		"The label value is invalid, and will not be accepted by Kubernetes",
+		s.Comments[0].Description,
+	)
 }
 func TestOKLabel(t *testing.T) {
 	t.Parallel()

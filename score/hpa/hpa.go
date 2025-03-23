@@ -26,7 +26,9 @@ func Register(allChecks *checks.Checks, options Options) {
 	)
 }
 
-func hpaHasTarget(options Options) func(hpa domain.HpaTargeter) (score scorecard.TestScore, err error) {
+func hpaHasTarget(
+	options Options,
+) func(hpa domain.HpaTargeter) (score scorecard.TestScore, err error) {
 	return func(hpa domain.HpaTargeter) (score scorecard.TestScore, err error) {
 		targetRef := hpa.HpaTarget()
 		var hasTarget bool
@@ -50,7 +52,9 @@ func hpaHasTarget(options Options) func(hpa domain.HpaTargeter) (score scorecard
 	}
 }
 
-func hpaHasMultipleReplicas(options Options) func(hpa domain.HpaTargeter) (score scorecard.TestScore, err error) {
+func hpaHasMultipleReplicas(
+	options Options,
+) func(hpa domain.HpaTargeter) (score scorecard.TestScore, err error) {
 	return func(hpa domain.HpaTargeter) (score scorecard.TestScore, err error) {
 		if ptr.Deref(hpa.MinReplicas(), 1) >= int32(options.MinReplicas) {
 			score.Grade = scorecard.GradeAllOK

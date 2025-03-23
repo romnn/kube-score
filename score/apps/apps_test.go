@@ -210,8 +210,20 @@ func TestDeploymentHasAntiAffinity(t *testing.T) {
 
 		score, err := deploymentHasAntiAffinity(s)
 		assert.Nil(t, err)
-		assert.Equal(t, tc.expectedGrade, score.Grade, "unexpected grade caseID=%d", caseID)
-		assert.Equal(t, tc.expectedSkipped, score.Skipped, "unexpected skipped, caseID=%d", caseID)
+		assert.Equal(
+			t,
+			tc.expectedGrade,
+			score.Grade,
+			"unexpected grade caseID=%d",
+			caseID,
+		)
+		assert.Equal(
+			t,
+			tc.expectedSkipped,
+			score.Skipped,
+			"unexpected skipped, caseID=%d",
+			caseID,
+		)
 	}
 }
 
@@ -497,7 +509,10 @@ func TestStatefulSetHasServiceName(t *testing.T) {
 			services: []ks.Service{
 				service{
 					corev1.Service{
-						ObjectMeta: metav1.ObjectMeta{Name: "foo-svc", Namespace: "foo-ns"},
+						ObjectMeta: metav1.ObjectMeta{
+							Name:      "foo-svc",
+							Namespace: "foo-ns",
+						},
 						Spec: corev1.ServiceSpec{
 							ClusterIP: "None",
 							Selector: map[string]string{
@@ -531,7 +546,10 @@ func TestStatefulSetHasServiceName(t *testing.T) {
 			services: []ks.Service{
 				service{
 					corev1.Service{
-						ObjectMeta: metav1.ObjectMeta{Name: "foo-svc", Namespace: "bar-ns"},
+						ObjectMeta: metav1.ObjectMeta{
+							Name:      "foo-svc",
+							Namespace: "bar-ns",
+						},
 						Spec: corev1.ServiceSpec{
 							ClusterIP: "None",
 							Selector: map[string]string{
@@ -565,7 +583,10 @@ func TestStatefulSetHasServiceName(t *testing.T) {
 			services: []ks.Service{
 				service{
 					corev1.Service{
-						ObjectMeta: metav1.ObjectMeta{Name: "foo-svc", Namespace: "bar-ns"},
+						ObjectMeta: metav1.ObjectMeta{
+							Name:      "foo-svc",
+							Namespace: "bar-ns",
+						},
 						Spec: corev1.ServiceSpec{
 							ClusterIP: "None",
 							Selector: map[string]string{
@@ -576,7 +597,10 @@ func TestStatefulSetHasServiceName(t *testing.T) {
 				},
 				service{
 					corev1.Service{
-						ObjectMeta: metav1.ObjectMeta{Name: "foo-svc", Namespace: "foo-ns"},
+						ObjectMeta: metav1.ObjectMeta{
+							Name:      "foo-svc",
+							Namespace: "foo-ns",
+						},
 						Spec: corev1.ServiceSpec{
 							ClusterIP: "None",
 							Selector: map[string]string{
@@ -610,7 +634,10 @@ func TestStatefulSetHasServiceName(t *testing.T) {
 			services: []ks.Service{
 				service{
 					corev1.Service{
-						ObjectMeta: metav1.ObjectMeta{Name: "foo-svc", Namespace: "foo-ns"},
+						ObjectMeta: metav1.ObjectMeta{
+							Name:      "foo-svc",
+							Namespace: "foo-ns",
+						},
 						Spec: corev1.ServiceSpec{
 							ClusterIP: "None",
 							Selector: map[string]string{
@@ -621,7 +648,10 @@ func TestStatefulSetHasServiceName(t *testing.T) {
 				},
 				service{
 					corev1.Service{
-						ObjectMeta: metav1.ObjectMeta{Name: "foo-svc", Namespace: "bar-ns"},
+						ObjectMeta: metav1.ObjectMeta{
+							Name:      "foo-svc",
+							Namespace: "bar-ns",
+						},
 						Spec: corev1.ServiceSpec{
 							ClusterIP: "None",
 							Selector: map[string]string{

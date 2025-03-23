@@ -19,7 +19,10 @@ func (l MapLabels) Lookup(label string) (value string, exists bool) {
 	return value, exists
 }
 
-func LabelSelectorMatchesLabels(selectorLabels map[string]string, labels map[string]string) bool {
+func LabelSelectorMatchesLabels(
+	selectorLabels map[string]string,
+	labels map[string]string,
+) bool {
 	labelSelector := &metav1.LabelSelector{
 		MatchLabels: selectorLabels,
 	}

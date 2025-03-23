@@ -8,7 +8,10 @@ import (
 
 type cmdFunc func(string, []string)
 
-func parse(args []string, cmds map[string]cmdFunc) (command string, cmdArgsOffset int, err error) {
+func parse(
+	args []string,
+	cmds map[string]cmdFunc,
+) (command string, cmdArgsOffset int, err error) {
 	helpName := execName(args[0])
 
 	// When executing kube-score as a kubectl plugin, default to the "score" sub-command to avoid stuttering
@@ -20,7 +23,7 @@ func parse(args []string, cmds map[string]cmdFunc) (command string, cmdArgsOffse
 
 	// No command, flag, or file has been specified
 	if len(args) <= cmdArgsOffset {
-		err = fmt.Errorf("No command, flag or file")
+		err = fmt.Errorf("no command, flag or file")
 		return
 	}
 

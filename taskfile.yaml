@@ -1,0 +1,83 @@
+version: 3
+tasks:
+  default:
+    cmds:
+      - task: run
+
+  run:race:
+    desc: "run kube-score with race detection"
+    dir: "{{.USER_WORKING_DIR}}" # allow user to pass relative paths as arguments
+    cmds:
+      - go run -race 'github.com/romnn/kube-score/cmd/kube-score' {{.CLI_ARGS}}
+
+  run:
+    desc: "run kube-score"
+    interactive: true
+    dir: "{{.USER_WORKING_DIR}}" # allow user to pass relative paths as arguments
+    cmds:
+      - go run 'github.com/romnn/kube-score/cmd/kube-score' {{.CLI_ARGS}}
+
+  build:race:
+    desc: "build kube-score with race detection"
+    cmds:
+      - go build -race ./... {{.CLI_ARGS}}
+
+  build:
+    desc: "build kube-score"
+    cmds:
+      - go build ./... {{.CLI_ARGS}}
+
+  build:executable:
+    desc: "build kube-score executable"
+    aliases: ["build:binary"]
+    cmds:
+      - go build 'github.com/romnn/kube-score/cmd/kube-score' {{.CLI_ARGS}}
+
+  build:release:
+    desc: "build kube-score in release mode using goreleaser"
+    cmds:
+      - goreleaser build --snapshot --clean
+
+  release:
+    desc: "release kube-score using goreleaser"
+    cmds:
+      - goreleaser release --clean
+
+  tidy:
+    desc: "tidy golang modules"
+    aliases: [install]
+    cmds:
+      - go get ./...
+      - go mod tidy
+
+  update:
+    desc: "update golang dependencies"
+    cmds:
+      - go get -u ./...
+      - task: tidy
+
+  typos:
+    desc: "spell check source files"
+    aliases: [spellcheck]
+    cmds:
+      - typos {{.CLI_ARGS}}
+
+  format:
+    desc: "format sources"
+    cmds:
+      - golines -m 88 -t 4 -w ./ {{.CLI_ARGS}}
+
+  lint:
+    desc: "lint"
+    aliases: [check]
+    cmds:
+      - go vet ./... {{.CLI_ARGS}}
+      - staticcheck ./... {{.CLI_ARGS}}
+      - golangci-lint run ./... {{.CLI_ARGS}}
+
+  test:
+    desc: "test with race detection"
+    aliases: ["test:race"]
+    cmds:
+      - richgo test ./... {{.CLI_ARGS}}
+      # - richgo test ./... -race {{.CLI_ARGS}}

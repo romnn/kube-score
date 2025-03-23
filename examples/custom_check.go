@@ -50,7 +50,11 @@ func ExampleCheckObject(raw []byte) (*scorecard.Scorecard, error) {
 
 	// Register check functions to run
 	checks := checks.New(nil)
-	checks.RegisterDeploymentCheck("custom-deployment-check", "A custom kube-score check function", customDeploymentCheck)
+	checks.RegisterDeploymentCheck(
+		"custom-deployment-check",
+		"A custom kube-score check function",
+		customDeploymentCheck,
+	)
 
 	return score.Score(allObjects, checks, &config.RunConfiguration{})
 }
@@ -60,7 +64,7 @@ func customDeploymentCheck(d v1.Deployment) (scorecard.TestScore, error) {
 		return scorecard.TestScore{
 			Grade: scorecard.GradeCritical,
 			Comments: []scorecard.TestScoreComment{{
-				Summary: "Deployments names can not contian 'foo'",
+				Summary: "Deployments names can not contain 'foo'",
 			}}}, nil
 	}
 

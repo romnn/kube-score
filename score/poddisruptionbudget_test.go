@@ -10,62 +10,122 @@ import (
 
 func TestStatefulSetPodDisruptionBudgetMatches(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "statefulset-poddisruptionbudget-v1beta1-matches.yaml", "StatefulSet has PodDisruptionBudget", scorecard.GradeAllOK)
+	testExpectedScore(
+		t,
+		"statefulset-poddisruptionbudget-v1beta1-matches.yaml",
+		"StatefulSet has PodDisruptionBudget",
+		scorecard.GradeAllOK,
+	)
 }
 
 func TestStatefulSetPodDisruptionBudgetExpressionMatches(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "statefulset-poddisruptionbudget-v1beta1-expression-matches.yaml", "StatefulSet has PodDisruptionBudget", scorecard.GradeAllOK)
+	testExpectedScore(
+		t,
+		"statefulset-poddisruptionbudget-v1beta1-expression-matches.yaml",
+		"StatefulSet has PodDisruptionBudget",
+		scorecard.GradeAllOK,
+	)
 }
 
 func TestStatefulSetPodDisruptionBudgetExpressionNoMatch(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "statefulset-poddisruptionbudget-v1beta1-expression-no-match.yaml", "StatefulSet has PodDisruptionBudget", scorecard.GradeCritical)
+	testExpectedScore(
+		t,
+		"statefulset-poddisruptionbudget-v1beta1-expression-no-match.yaml",
+		"StatefulSet has PodDisruptionBudget",
+		scorecard.GradeCritical,
+	)
 }
 
 func TestStatefulSetPodDisruptionBudgetNoMatch(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "statefulset-poddisruptionbudget-v1beta1-no-match.yaml", "StatefulSet has PodDisruptionBudget", scorecard.GradeCritical)
+	testExpectedScore(
+		t,
+		"statefulset-poddisruptionbudget-v1beta1-no-match.yaml",
+		"StatefulSet has PodDisruptionBudget",
+		scorecard.GradeCritical,
+	)
 }
 
 func TestDeploymentPodDisruptionBudgetMatches(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "deployment-poddisruptionbudget-v1beta1-matches.yaml", "Deployment has PodDisruptionBudget", scorecard.GradeAllOK)
+	testExpectedScore(
+		t,
+		"deployment-poddisruptionbudget-v1beta1-matches.yaml",
+		"Deployment has PodDisruptionBudget",
+		scorecard.GradeAllOK,
+	)
 }
 
 func TestDeploymentPodDisruptionBudgetExpressionMatches(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "deployment-poddisruptionbudget-v1beta1-expression-matches.yaml", "Deployment has PodDisruptionBudget", scorecard.GradeAllOK)
+	testExpectedScore(
+		t,
+		"deployment-poddisruptionbudget-v1beta1-expression-matches.yaml",
+		"Deployment has PodDisruptionBudget",
+		scorecard.GradeAllOK,
+	)
 }
 
 func TestDeploymentPodDisruptionBudgetExpressionNoMatch(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "deployment-poddisruptionbudget-v1beta1-expression-no-match.yaml", "Deployment has PodDisruptionBudget", scorecard.GradeCritical)
+	testExpectedScore(
+		t,
+		"deployment-poddisruptionbudget-v1beta1-expression-no-match.yaml",
+		"Deployment has PodDisruptionBudget",
+		scorecard.GradeCritical,
+	)
 }
 
 func TestDeploymentPodDisruptionBudgetNoMatch(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "deployment-poddisruptionbudget-v1beta1-no-match.yaml", "Deployment has PodDisruptionBudget", scorecard.GradeCritical)
+	testExpectedScore(
+		t,
+		"deployment-poddisruptionbudget-v1beta1-no-match.yaml",
+		"Deployment has PodDisruptionBudget",
+		scorecard.GradeCritical,
+	)
 }
 
 func TestDeploymentPodDisruptionBudgetNoPolicy(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "deployment-poddisruptionbudget-v1beta1-no-policy.yaml", "PodDisruptionBudget has policy", scorecard.GradeCritical)
+	testExpectedScore(
+		t,
+		"deployment-poddisruptionbudget-v1beta1-no-policy.yaml",
+		"PodDisruptionBudget has policy",
+		scorecard.GradeCritical,
+	)
 }
 
 func TestDeploymentPodDisruptionBudgetV1NoPolicy(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "deployment-poddisruptionbudget-v1-no-policy.yaml", "PodDisruptionBudget has policy", scorecard.GradeCritical)
+	testExpectedScore(
+		t,
+		"deployment-poddisruptionbudget-v1-no-policy.yaml",
+		"PodDisruptionBudget has policy",
+		scorecard.GradeCritical,
+	)
 }
 
 func TestDeploymentPodDisruptionBudgetV1Matches(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "deployment-poddisruptionbudget-v1-matches.yaml", "Deployment has PodDisruptionBudget", scorecard.GradeAllOK)
+	testExpectedScore(
+		t,
+		"deployment-poddisruptionbudget-v1-matches.yaml",
+		"Deployment has PodDisruptionBudget",
+		scorecard.GradeAllOK,
+	)
 }
 
 func TestDeploymentPodDisruptionBudgetV1NoMatch(t *testing.T) {
 	t.Parallel()
-	actual := testExpectedScore(t, "deployment-poddisruptionbudget-v1-no-match.yaml", "Deployment has PodDisruptionBudget", scorecard.GradeCritical)
+	actual := testExpectedScore(
+		t,
+		"deployment-poddisruptionbudget-v1-no-match.yaml",
+		"Deployment has PodDisruptionBudget",
+		scorecard.GradeCritical,
+	)
 
 	expected := []scorecard.TestScoreComment{
 		{
@@ -81,7 +141,12 @@ func TestDeploymentPodDisruptionBudgetV1NoMatch(t *testing.T) {
 
 func TestDeploymentPodDisruptionBudgetV1NoMatchMatchInOtherNamespace(t *testing.T) {
 	t.Parallel()
-	actual := testExpectedScore(t, "deployment-poddisruptionbudget-v1-different-namespace.yaml", "Deployment has PodDisruptionBudget", scorecard.GradeCritical)
+	actual := testExpectedScore(
+		t,
+		"deployment-poddisruptionbudget-v1-different-namespace.yaml",
+		"Deployment has PodDisruptionBudget",
+		scorecard.GradeCritical,
+	)
 
 	expected := []scorecard.TestScoreComment{
 		{

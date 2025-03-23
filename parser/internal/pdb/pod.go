@@ -36,7 +36,9 @@ func (p PodDisruptionBudgetV1beta1) FileLocation() ks.FileLocation {
 func (p PodDisruptionBudgetV1beta1) Spec() policyv1.PodDisruptionBudgetSpec {
 	var polType *policyv1.UnhealthyPodEvictionPolicyType
 	if p.Obj.Spec.UnhealthyPodEvictionPolicy != nil {
-		t := policyv1.UnhealthyPodEvictionPolicyType(*p.Obj.Spec.UnhealthyPodEvictionPolicy)
+		t := policyv1.UnhealthyPodEvictionPolicyType(
+			*p.Obj.Spec.UnhealthyPodEvictionPolicy,
+		)
 		polType = &t
 	}
 

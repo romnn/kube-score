@@ -12,9 +12,15 @@ import (
 func TestOptionalSkippedByDefault(t *testing.T) {
 	t.Parallel()
 	enabledOptionalTests := make(map[string]struct{})
-	wasSkipped(t, []ks.NamedReader{testFile("pod-container-memory-requests.yaml")}, nil, &config.RunConfiguration{
-		EnabledOptionalTests: enabledOptionalTests,
-	}, "Container Memory Requests Equal Limits")
+	wasSkipped(
+		t,
+		[]ks.NamedReader{testFile("pod-container-memory-requests.yaml")},
+		nil,
+		&config.RunConfiguration{
+			EnabledOptionalTests: enabledOptionalTests,
+		},
+		"Container Memory Requests Equal Limits",
+	)
 }
 
 func TestOptionalIgnoredAndEnabled(t *testing.T) {
@@ -26,11 +32,17 @@ func TestOptionalIgnoredAndEnabled(t *testing.T) {
 	ignoredTests := make(map[string]struct{})
 	ignoredTests["container-resource-requests-equal-limits"] = struct{}{}
 
-	wasSkipped(t, []ks.NamedReader{testFile("pod-container-memory-requests.yaml")}, &checks.Config{
-		IgnoredTests: ignoredTests,
-	}, &config.RunConfiguration{
-		EnabledOptionalTests: enabledOptionalTests,
-	}, "Container Memory Requests Equal Limits")
+	wasSkipped(
+		t,
+		[]ks.NamedReader{testFile("pod-container-memory-requests.yaml")},
+		&checks.Config{
+			IgnoredTests: ignoredTests,
+		},
+		&config.RunConfiguration{
+			EnabledOptionalTests: enabledOptionalTests,
+		},
+		"Container Memory Requests Equal Limits",
+	)
 }
 
 func TestOptionalRunCliFlagEnabledDefault(t *testing.T) {
@@ -39,10 +51,18 @@ func TestOptionalRunCliFlagEnabledDefault(t *testing.T) {
 	enabledOptionalTests := make(map[string]struct{})
 	enabledOptionalTests["container-resource-requests-equal-limits"] = struct{}{}
 
-	testExpectedScoreWithConfig(t,
-		[]ks.NamedReader{testFile("pod-container-memory-requests.yaml")}, nil, &config.RunConfiguration{
+	testExpectedScoreWithConfig(
+		t,
+		[]ks.NamedReader{
+			testFile("pod-container-memory-requests.yaml"),
+		},
+		nil,
+		&config.RunConfiguration{
 			EnabledOptionalTests: enabledOptionalTests,
-		}, "Container Memory Requests Equal Limits", scorecard.GradeCritical)
+		},
+		"Container Memory Requests Equal Limits",
+		scorecard.GradeCritical,
+	)
 }
 
 func TestOptionalRunAnnotationEnabled(t *testing.T) {
@@ -50,8 +70,16 @@ func TestOptionalRunAnnotationEnabled(t *testing.T) {
 
 	enabledOptionalTests := make(map[string]struct{})
 
-	testExpectedScoreWithConfig(t, []ks.NamedReader{testFile("pod-container-memory-requests-annotation-optional.yaml")}, nil,
+	testExpectedScoreWithConfig(
+		t,
+		[]ks.NamedReader{
+			testFile("pod-container-memory-requests-annotation-optional.yaml"),
+		},
+		nil,
 		&config.RunConfiguration{
 			EnabledOptionalTests: enabledOptionalTests,
-		}, "Container Memory Requests Equal Limits", scorecard.GradeCritical)
+		},
+		"Container Memory Requests Equal Limits",
+		scorecard.GradeCritical,
+	)
 }

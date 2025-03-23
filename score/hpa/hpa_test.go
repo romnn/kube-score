@@ -45,7 +45,10 @@ func TestHpaHasTarget(t *testing.T) {
 			},
 			allTargets: []domain.BothMeta{
 				{
-					TypeMeta:   metav1.TypeMeta{Kind: "Deployment", APIVersion: "apps/v1"},
+					TypeMeta: metav1.TypeMeta{
+						Kind:       "Deployment",
+						APIVersion: "apps/v1",
+					},
 					ObjectMeta: metav1.ObjectMeta{Name: "foo"},
 				},
 			},
@@ -66,7 +69,10 @@ func TestHpaHasTarget(t *testing.T) {
 			},
 			allTargets: []domain.BothMeta{
 				{
-					TypeMeta:   metav1.TypeMeta{Kind: "Deployment", APIVersion: "apps/v1"},
+					TypeMeta: metav1.TypeMeta{
+						Kind:       "Deployment",
+						APIVersion: "apps/v1",
+					},
 					ObjectMeta: metav1.ObjectMeta{Name: "foo", Namespace: "foospace"},
 				},
 			},
@@ -87,7 +93,10 @@ func TestHpaHasTarget(t *testing.T) {
 			},
 			allTargets: []domain.BothMeta{
 				{
-					TypeMeta:   metav1.TypeMeta{Kind: "Deployment", APIVersion: "apps/v1"},
+					TypeMeta: metav1.TypeMeta{
+						Kind:       "Deployment",
+						APIVersion: "apps/v1",
+					},
 					ObjectMeta: metav1.ObjectMeta{Name: "foo", Namespace: "foospace"},
 				},
 			},
@@ -108,7 +117,10 @@ func TestHpaHasTarget(t *testing.T) {
 			},
 			allTargets: []domain.BothMeta{
 				{
-					TypeMeta:   metav1.TypeMeta{Kind: "Deployment", APIVersion: "apps/v1"},
+					TypeMeta: metav1.TypeMeta{
+						Kind:       "Deployment",
+						APIVersion: "apps/v1",
+					},
 					ObjectMeta: metav1.ObjectMeta{Name: "foo", Namespace: "foospace"},
 				},
 			},
@@ -129,7 +141,10 @@ func TestHpaHasTarget(t *testing.T) {
 			},
 			allTargets: []domain.BothMeta{
 				{
-					TypeMeta:   metav1.TypeMeta{Kind: "Deployment", APIVersion: "apps/v1"},
+					TypeMeta: metav1.TypeMeta{
+						Kind:       "Deployment",
+						APIVersion: "apps/v1",
+					},
 					ObjectMeta: metav1.ObjectMeta{Name: "foo", Namespace: "foospace"},
 				},
 			},
@@ -150,7 +165,10 @@ func TestHpaHasTarget(t *testing.T) {
 			},
 			allTargets: []domain.BothMeta{
 				{
-					TypeMeta:   metav1.TypeMeta{Kind: "Deployment", APIVersion: "apps/v1"},
+					TypeMeta: metav1.TypeMeta{
+						Kind:       "Deployment",
+						APIVersion: "apps/v1",
+					},
 					ObjectMeta: metav1.ObjectMeta{Name: "foo", Namespace: "foospace"},
 				},
 			},

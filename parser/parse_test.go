@@ -19,7 +19,9 @@ func TestParse(t *testing.T) {
 	}{
 		{
 			"testdata/invalid-yaml.yaml",
-			fmt.Errorf("Failed to parse /v1, Kind=Service: err=json: cannot unmarshal string into Go struct field ServicePort.spec.ports.nodePort of type int32"),
+			fmt.Errorf(
+				"failed to parse /v1, Kind=Service: err=json: cannot unmarshal string into Go struct field ServicePort.spec.ports.nodePort of type int32",
+			),
 		}, {
 			"testdata/valid-yaml.yaml",
 			nil,
