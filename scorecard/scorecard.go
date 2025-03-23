@@ -26,7 +26,11 @@ func New() Scorecard {
 	return make(Scorecard)
 }
 
-func (s Scorecard) NewObject(typeMeta metav1.TypeMeta, objectMeta metav1.ObjectMeta, cnf *config.RunConfiguration) *ScoredObject {
+func (s Scorecard) NewObject(
+	typeMeta metav1.TypeMeta,
+	objectMeta metav1.ObjectMeta,
+	cnf *config.RunConfiguration,
+) *ScoredObject {
 	if cnf == nil {
 		cnf = &config.RunConfiguration{}
 	}
@@ -92,7 +96,12 @@ func (so *ScoredObject) HumanFriendlyRef() string {
 	return s
 }
 
-func (so *ScoredObject) Add(ts TestScore, check ks.Check, locationer ks.FileLocationer, annotations ...map[string]string) {
+func (so *ScoredObject) Add(
+	ts TestScore,
+	check ks.Check,
+	locationer ks.FileLocationer,
+	annotations ...map[string]string,
+) {
 	ts.Check = check
 	so.FileLocation = locationer.FileLocation()
 
@@ -104,7 +113,8 @@ func (so *ScoredObject) Add(ts TestScore, check ks.Check, locationer ks.FileLoca
 		if len(annotations) == 1 && !so.isEnabled(check, annotations[0], nil) {
 			skip = true
 		}
-		if len(annotations) == 2 && !so.isEnabled(check, annotations[0], annotations[1]) {
+		if len(annotations) == 2 &&
+			!so.isEnabled(check, annotations[0], annotations[1]) {
 			skip = true
 		}
 	}
@@ -168,7 +178,9 @@ func (ts *TestScore) AddComment(path, summary, description string) {
 	})
 }
 
-func (ts *TestScore) AddCommentWithURL(path, summary, description, documentationURL string) {
+func (ts *TestScore) AddCommentWithURL(
+	path, summary, description, documentationURL string,
+) {
 	ts.Comments = append(ts.Comments, TestScoreComment{
 		Path:             path,
 		Summary:          summary,

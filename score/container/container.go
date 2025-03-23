@@ -23,26 +23,66 @@ func Register(allChecks *checks.Checks, options Options) {
 		containerResources(options),
 		// containerResources,
 	)
-	allChecks.RegisterOptionalPodCheck("Container Resource Requests Equal Limits", `Makes sure that all pods have the same requests as limits on resources set.`, containerResourceRequestsEqualLimits(options))
-	allChecks.RegisterOptionalPodCheck("Container CPU Requests Equal Limits", `Makes sure that all pods have the same CPU requests as limits set.`, containerCPURequestsEqualLimits(options))
-	allChecks.RegisterOptionalPodCheck("Container Memory Requests Equal Limits", `Makes sure that all pods have the same memory requests as limits set.`, containerMemoryRequestsEqualLimits(options))
-	allChecks.RegisterPodCheck("Container Image Tag", `Makes sure that a explicit non-latest tag is used`, containerImageTag(options))
-	allChecks.RegisterPodCheck("Container Image Pull Policy", `Makes sure that the pullPolicy is set to Always. This makes sure that imagePullSecrets are always validated.`, containerImagePullPolicy(options))
-	allChecks.RegisterPodCheck("Container Ephemeral Storage Request and Limit", "Makes sure all pods have ephemeral-storage requests and limits set", containerStorageEphemeralRequestAndLimit(options))
-	allChecks.RegisterOptionalPodCheck("Container Ephemeral Storage Request Equals Limit", "Make sure all pods have matching ephemeral-storage requests and limits", containerStorageEphemeralRequestEqualsLimit(options))
-	allChecks.RegisterOptionalPodCheck("Container Ports Check", "Container Ports Checks", containerPortsCheck(options))
-	allChecks.RegisterPodCheck("Environment Variable Key Duplication", "Makes sure that duplicated environment variable keys are not duplicated", environmentVariableKeyDuplication(options))
+	allChecks.RegisterOptionalPodCheck(
+		"Container Resource Requests Equal Limits",
+		`Makes sure that all pods have the same requests as limits on resources set.`,
+		containerResourceRequestsEqualLimits(options),
+	)
+	allChecks.RegisterOptionalPodCheck(
+		"Container CPU Requests Equal Limits",
+		`Makes sure that all pods have the same CPU requests as limits set.`,
+		containerCPURequestsEqualLimits(options),
+	)
+	allChecks.RegisterOptionalPodCheck(
+		"Container Memory Requests Equal Limits",
+		`Makes sure that all pods have the same memory requests as limits set.`,
+		containerMemoryRequestsEqualLimits(options),
+	)
+	allChecks.RegisterPodCheck(
+		"Container Image Tag",
+		`Makes sure that a explicit non-latest tag is used`,
+		containerImageTag(options),
+	)
+	allChecks.RegisterPodCheck(
+		"Container Image Pull Policy",
+		`Makes sure that the pullPolicy is set to Always. This makes sure that imagePullSecrets are always validated.`,
+		containerImagePullPolicy(options),
+	)
+	allChecks.RegisterPodCheck(
+		"Container Ephemeral Storage Request and Limit",
+		"Makes sure all pods have ephemeral-storage requests and limits set",
+		containerStorageEphemeralRequestAndLimit(options),
+	)
+	allChecks.RegisterOptionalPodCheck(
+		"Container Ephemeral Storage Request Equals Limit",
+		"Make sure all pods have matching ephemeral-storage requests and limits",
+		containerStorageEphemeralRequestEqualsLimit(options),
+	)
+	allChecks.RegisterOptionalPodCheck(
+		"Container Ports Check",
+		"Container Ports Checks",
+		containerPortsCheck(options),
+	)
+	allChecks.RegisterPodCheck(
+		"Environment Variable Key Duplication",
+		"Makes sure that duplicated environment variable keys are not duplicated",
+		environmentVariableKeyDuplication(options),
+	)
 }
 
 // containerResources makes sure that the container has resource requests and limits set
 // The check for a CPU limit requirement can be enabled via the requireCPULimit flag parameter
-func containerResources(options Options) func(ks.PodSpecer) (scorecard.TestScore, error) {
+func containerResources(
+	options Options,
+) func(ks.PodSpecer) (scorecard.TestScore, error) {
 	return func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 		pod := ps.GetPodTemplateSpec().Spec
 
 		var allContainers []corev1.Container
 		if !options.SkipInitContainers {
-			allContainers = append(allContainers, ps.GetPodTemplateSpec().Spec.InitContainers...)
+			allContainers = append(
+				allContainers,
+				ps.GetPodTemplateSpec().Spec.InitContainers...)
 		}
 		allContainers = append(allContainers, pod.Containers...)
 
@@ -50,20 +90,38 @@ func containerResources(options Options) func(ks.PodSpecer) (scorecard.TestScore
 		hasMissingRequest := false
 
 		for _, container := range allContainers {
-			if container.Resources.Limits.Cpu().IsZero() && !options.IgnoreContainerCpuLimitRequirement {
-				score.AddComment(container.Name, "CPU limit is not set", "Resource limits are recommended to avoid resource DDOS. Set resources.limits.cpu")
+			if container.Resources.Limits.Cpu().IsZero() &&
+				!options.IgnoreContainerCpuLimitRequirement {
+				score.AddComment(
+					container.Name,
+					"CPU limit is not set",
+					"Resource limits are recommended to avoid resource DDOS. Set resources.limits.cpu",
+				)
 				hasMissingLimit = true
 			}
-			if container.Resources.Limits.Memory().IsZero() && !options.IgnoreContainerMemoryLimitRequirement {
-				score.AddComment(container.Name, "Memory limit is not set", "Resource limits are recommended to avoid resource DDOS. Set resources.limits.memory")
+			if container.Resources.Limits.Memory().IsZero() &&
+				!options.IgnoreContainerMemoryLimitRequirement {
+				score.AddComment(
+					container.Name,
+					"Memory limit is not set",
+					"Resource limits are recommended to avoid resource DDOS. Set resources.limits.memory",
+				)
 				hasMissingLimit = true
 			}
 			if container.Resources.Requests.Cpu().IsZero() {
-				score.AddComment(container.Name, "CPU request is not set", "Resource requests are recommended to make sure that the application can start and run without crashing. Set resources.requests.cpu")
+				score.AddComment(
+					container.Name,
+					"CPU request is not set",
+					"Resource requests are recommended to make sure that the application can start and run without crashing. Set resources.requests.cpu",
+				)
 				hasMissingRequest = true
 			}
 			if container.Resources.Requests.Memory().IsZero() {
-				score.AddComment(container.Name, "Memory request is not set", "Resource requests are recommended to make sure that the application can start and run without crashing. Set resources.requests.memory")
+				score.AddComment(
+					container.Name,
+					"Memory request is not set",
+					"Resource requests are recommended to make sure that the application can start and run without crashing. Set resources.requests.memory",
+				)
 				hasMissingRequest = true
 			}
 		}
@@ -85,7 +143,9 @@ func containerResources(options Options) func(ks.PodSpecer) (scorecard.TestScore
 }
 
 // containerResourceRequestsEqualLimits checks that all containers have equal requests and limits for CPU and memory resources
-func containerResourceRequestsEqualLimits(options Options) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
+func containerResourceRequestsEqualLimits(
+	options Options,
+) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 	return func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 		cpuScore, _ := containerCPURequestsEqualLimits(options)(ps)
 		memoryScore, _ := containerMemoryRequestsEqualLimits(options)(ps)
@@ -105,13 +165,17 @@ func containerResourceRequestsEqualLimits(options Options) func(ps ks.PodSpecer)
 }
 
 // containerCPURequestsEqualLimits checks that all containers have equal requests and limits for CPU resources
-func containerCPURequestsEqualLimits(options Options) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
+func containerCPURequestsEqualLimits(
+	options Options,
+) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 	return func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 		pod := ps.GetPodTemplateSpec().Spec
 
 		var allContainers []corev1.Container
 		if !options.SkipInitContainers {
-			allContainers = append(allContainers, ps.GetPodTemplateSpec().Spec.InitContainers...)
+			allContainers = append(
+				allContainers,
+				ps.GetPodTemplateSpec().Spec.InitContainers...)
 		}
 		allContainers = append(allContainers, pod.Containers...)
 
@@ -121,7 +185,11 @@ func containerCPURequestsEqualLimits(options Options) func(ps ks.PodSpecer) (sco
 			requests := &container.Resources.Requests
 			limits := &container.Resources.Limits
 			if !requests.Cpu().Equal(*limits.Cpu()) {
-				score.AddComment(container.Name, "CPU requests does not match limits", "Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.cpu == resources.limits.cpu")
+				score.AddComment(
+					container.Name,
+					"CPU requests does not match limits",
+					"Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.cpu == resources.limits.cpu",
+				)
 				resourcesDoNotMatch = true
 			}
 		}
@@ -137,13 +205,17 @@ func containerCPURequestsEqualLimits(options Options) func(ps ks.PodSpecer) (sco
 }
 
 // containerMemoryRequestsEqualLimits checks that all containers have equal requests and limits for memory resources
-func containerMemoryRequestsEqualLimits(options Options) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
+func containerMemoryRequestsEqualLimits(
+	options Options,
+) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 	return func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 		pod := ps.GetPodTemplateSpec().Spec
 
 		var allContainers []corev1.Container
 		if !options.SkipInitContainers {
-			allContainers = append(allContainers, ps.GetPodTemplateSpec().Spec.InitContainers...)
+			allContainers = append(
+				allContainers,
+				ps.GetPodTemplateSpec().Spec.InitContainers...)
 		}
 
 		allContainers = append(allContainers, pod.Containers...)
@@ -154,7 +226,11 @@ func containerMemoryRequestsEqualLimits(options Options) func(ps ks.PodSpecer) (
 			requests := &container.Resources.Requests
 			limits := &container.Resources.Limits
 			if !requests.Memory().Equal(*limits.Memory()) {
-				score.AddComment(container.Name, "Memory requests does not match limits", "Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.memory == resources.limits.memory")
+				score.AddComment(
+					container.Name,
+					"Memory requests does not match limits",
+					"Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.memory == resources.limits.memory",
+				)
 				resourcesDoNotMatch = true
 			}
 		}
@@ -170,13 +246,17 @@ func containerMemoryRequestsEqualLimits(options Options) func(ps ks.PodSpecer) (
 }
 
 // containerImageTag checks that no container is using the ":latest" tag
-func containerImageTag(options Options) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
+func containerImageTag(
+	options Options,
+) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 	return func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 		pod := ps.GetPodTemplateSpec().Spec
 
 		var allContainers []corev1.Container
 		if !options.SkipInitContainers {
-			allContainers = append(allContainers, ps.GetPodTemplateSpec().Spec.InitContainers...)
+			allContainers = append(
+				allContainers,
+				ps.GetPodTemplateSpec().Spec.InitContainers...)
 		}
 		allContainers = append(allContainers, pod.Containers...)
 
@@ -185,7 +265,11 @@ func containerImageTag(options Options) func(ps ks.PodSpecer) (score scorecard.T
 		for _, container := range allContainers {
 			tag := containerTag(container.Image)
 			if tag == "" || tag == "latest" {
-				score.AddComment(container.Name, "Image with latest tag", "Using a fixed tag is recommended to avoid accidental upgrades")
+				score.AddComment(
+					container.Name,
+					"Image with latest tag",
+					"Using a fixed tag is recommended to avoid accidental upgrades",
+				)
 				hasTagLatest = true
 			}
 		}
@@ -201,13 +285,17 @@ func containerImageTag(options Options) func(ps ks.PodSpecer) (score scorecard.T
 }
 
 // containerImagePullPolicy checks if the containers ImagePullPolicy is set to PullAlways
-func containerImagePullPolicy(options Options) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
+func containerImagePullPolicy(
+	options Options,
+) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 	return func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 		pod := ps.GetPodTemplateSpec().Spec
 
 		var allContainers []corev1.Container
 		if !options.SkipInitContainers {
-			allContainers = append(allContainers, ps.GetPodTemplateSpec().Spec.InitContainers...)
+			allContainers = append(
+				allContainers,
+				ps.GetPodTemplateSpec().Spec.InitContainers...)
 		}
 		allContainers = append(allContainers, pod.Containers...)
 
@@ -219,13 +307,19 @@ func containerImagePullPolicy(options Options) func(ps ks.PodSpecer) (score scor
 
 			// If the pull policy is not set, and the tag is either empty or latest
 			// kubernetes will default to always pull the image
-			if container.ImagePullPolicy == corev1.PullPolicy("") && (tag == "" || tag == "latest") {
+			if container.ImagePullPolicy == corev1.PullPolicy("") &&
+				(tag == "" || tag == "latest") {
 				continue
 			}
 
 			// No defined pull policy
-			if container.ImagePullPolicy != corev1.PullAlways || container.ImagePullPolicy == corev1.PullPolicy("") {
-				score.AddComment(container.Name, "ImagePullPolicy is not set to Always", "It's recommended to always set the ImagePullPolicy to Always, to make sure that the imagePullSecrets are always correct, and to always get the image you want.")
+			if container.ImagePullPolicy != corev1.PullAlways ||
+				container.ImagePullPolicy == corev1.PullPolicy("") {
+				score.AddComment(
+					container.Name,
+					"ImagePullPolicy is not set to Always",
+					"It's recommended to always set the ImagePullPolicy to Always, to make sure that the imagePullSecrets are always correct, and to always get the image you want.",
+				)
 				score.Grade = scorecard.GradeCritical
 			}
 		}
@@ -245,13 +339,19 @@ func containerTag(image string) string {
 	return ""
 }
 
-func containerStorageEphemeralRequestAndLimit(options Options) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
+func containerStorageEphemeralRequestAndLimit(
+	options Options,
+) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 	return func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 		var allContainers []corev1.Container
 		if !options.SkipInitContainers {
-			allContainers = append(allContainers, ps.GetPodTemplateSpec().Spec.InitContainers...)
+			allContainers = append(
+				allContainers,
+				ps.GetPodTemplateSpec().Spec.InitContainers...)
 		}
-		allContainers = append(allContainers, ps.GetPodTemplateSpec().Spec.Containers...)
+		allContainers = append(
+			allContainers,
+			ps.GetPodTemplateSpec().Spec.Containers...)
 
 		score.Grade = scorecard.GradeAllOK
 
@@ -260,13 +360,19 @@ func containerStorageEphemeralRequestAndLimit(options Options) func(ps ks.PodSpe
 
 		for _, container := range allContainers {
 			if container.Resources.Limits.StorageEphemeral().IsZero() {
-				score.AddComment(container.Name, "Ephemeral Storage limit is not set",
-					"Resource limits are recommended to avoid resource DDOS. Set resources.limits.ephemeral-storage")
+				score.AddComment(
+					container.Name,
+					"Ephemeral Storage limit is not set",
+					"Resource limits are recommended to avoid resource DDOS. Set resources.limits.ephemeral-storage",
+				)
 				hasMissingLimit = true
 			}
 			if container.Resources.Requests.StorageEphemeral().IsZero() {
-				score.AddComment(container.Name, "Ephemeral Storage request is not set",
-					"Resource requests are recommended to make sure the application can start and run without crashing. Set resource.requests.ephemeral-storage")
+				score.AddComment(
+					container.Name,
+					"Ephemeral Storage request is not set",
+					"Resource requests are recommended to make sure the application can start and run without crashing. Set resource.requests.ephemeral-storage",
+				)
 				hasMissingRequest = true
 			}
 		}
@@ -287,22 +393,33 @@ func containerStorageEphemeralRequestAndLimit(options Options) func(ps ks.PodSpe
 	}
 }
 
-func containerStorageEphemeralRequestEqualsLimit(options Options) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
+func containerStorageEphemeralRequestEqualsLimit(
+	options Options,
+) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 	return func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 		var allContainers []corev1.Container
 		if !options.SkipInitContainers {
-			allContainers = append(allContainers, ps.GetPodTemplateSpec().Spec.InitContainers...)
+			allContainers = append(
+				allContainers,
+				ps.GetPodTemplateSpec().Spec.InitContainers...)
 		}
-		allContainers = append(allContainers, ps.GetPodTemplateSpec().Spec.Containers...)
+		allContainers = append(
+			allContainers,
+			ps.GetPodTemplateSpec().Spec.Containers...)
 
 		score.Grade = scorecard.GradeAllOK
 
 		for _, container := range allContainers {
-			if !container.Resources.Limits.StorageEphemeral().IsZero() && !container.Resources.Requests.StorageEphemeral().IsZero() {
+			if !container.Resources.Limits.StorageEphemeral().IsZero() &&
+				!container.Resources.Requests.StorageEphemeral().IsZero() {
 				requests := &container.Resources.Requests
 				limits := &container.Resources.Limits
 				if !requests.StorageEphemeral().Equal(*limits.StorageEphemeral()) {
-					score.AddComment(container.Name, "Ephemeral Storage request does not match limit", "Having equal requests and limits is recommended to avoid node resource DDOS during spikes")
+					score.AddComment(
+						container.Name,
+						"Ephemeral Storage request does not match limit",
+						"Having equal requests and limits is recommended to avoid node resource DDOS during spikes",
+					)
 					score.Grade = scorecard.GradeCritical
 				}
 			}
@@ -315,15 +432,21 @@ func containerStorageEphemeralRequestEqualsLimit(options Options) func(ps ks.Pod
 // List of ports to expose from the container. This is primarily informational. Not specifying a port here
 // does not prevent it from being exposed. Specifying it does not expose the port outside the cluster; that
 // requires a Service object.
-func containerPortsCheck(options Options) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
+func containerPortsCheck(
+	options Options,
+) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 	return func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 		const maxPortNameLength = 15
 
 		var allContainers []corev1.Container
 		if !options.SkipInitContainers {
-			allContainers = append(allContainers, ps.GetPodTemplateSpec().Spec.InitContainers...)
+			allContainers = append(
+				allContainers,
+				ps.GetPodTemplateSpec().Spec.InitContainers...)
 		}
-		allContainers = append(allContainers, ps.GetPodTemplateSpec().Spec.Containers...)
+		allContainers = append(
+			allContainers,
+			ps.GetPodTemplateSpec().Spec.Containers...)
 
 		score.Grade = scorecard.GradeAllOK
 
@@ -339,11 +462,19 @@ func containerPortsCheck(options Options) func(ps ks.PodSpecer) (score scorecard
 					}
 				}
 				if len(port.Name) > maxPortNameLength {
-					score.AddComment(container.Name, "Container Port Check", "Container port.Name length exceeds maximum permitted characters")
+					score.AddComment(
+						container.Name,
+						"Container Port Check",
+						"Container port.Name length exceeds maximum permitted characters",
+					)
 					score.Grade = scorecard.GradeCritical
 				}
 				if port.ContainerPort == 0 {
-					score.AddComment(container.Name, "Container Port Check", "Container ports.containerPort cannot be empty")
+					score.AddComment(
+						container.Name,
+						"Container Port Check",
+						"Container ports.containerPort cannot be empty",
+					)
 					score.Grade = scorecard.GradeCritical
 				}
 			}
@@ -354,13 +485,17 @@ func containerPortsCheck(options Options) func(ps ks.PodSpecer) (score scorecard
 }
 
 // environmentVariableKeyDuplication checks that no duplicated environment variable keys.
-func environmentVariableKeyDuplication(options Options) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
+func environmentVariableKeyDuplication(
+	options Options,
+) func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 	return func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 		pod := ps.GetPodTemplateSpec().Spec
 
 		var allContainers []corev1.Container
 		if !options.SkipInitContainers {
-			allContainers = append(allContainers, ps.GetPodTemplateSpec().Spec.InitContainers...)
+			allContainers = append(
+				allContainers,
+				ps.GetPodTemplateSpec().Spec.InitContainers...)
 		}
 		allContainers = append(allContainers, pod.Containers...)
 
@@ -370,8 +505,15 @@ func environmentVariableKeyDuplication(options Options) func(ps ks.PodSpecer) (s
 			envs := make(map[string]struct{})
 			for _, env := range container.Env {
 				if _, duplicated := envs[env.Name]; duplicated {
-					msg := fmt.Sprintf("Container environment variable key '%s' is duplicated", env.Name)
-					score.AddComment(container.Name, "Environment Variable Key Duplication", msg)
+					msg := fmt.Sprintf(
+						"Container environment variable key '%s' is duplicated",
+						env.Name,
+					)
+					score.AddComment(
+						container.Name,
+						"Environment Variable Key Duplication",
+						msg,
+					)
 					score.Grade = scorecard.GradeCritical
 					continue
 				}

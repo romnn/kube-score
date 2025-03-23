@@ -6,37 +6,72 @@ import (
 	"github.com/zegl/kube-score/scorecard"
 )
 
-func TestPodTopologySpreadContraintsWithOneConstraint(t *testing.T) {
+func TestPodTopologySpreadConstraintsWithOneConstraint(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "pod-topology-spread-constraints-one-constraint.yaml", "Pod Topology Spread Constraints", scorecard.GradeAllOK)
+	testExpectedScore(
+		t,
+		"pod-topology-spread-constraints-one-constraint.yaml",
+		"Pod Topology Spread Constraints",
+		scorecard.GradeAllOK,
+	)
 }
 
-func TestPodTopologySpreadContraintsWithTwoConstraints(t *testing.T) {
+func TestPodTopologySpreadConstraintsWithTwoConstraints(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "pod-topology-spread-constraints-two-constraints.yaml", "Pod Topology Spread Constraints", scorecard.GradeAllOK)
+	testExpectedScore(
+		t,
+		"pod-topology-spread-constraints-two-constraints.yaml",
+		"Pod Topology Spread Constraints",
+		scorecard.GradeAllOK,
+	)
 }
 
-func TestPodTopologySpreadContraintsNoLabelSelector(t *testing.T) {
+func TestPodTopologySpreadConstraintsNoLabelSelector(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "pod-topology-spread-constraints-no-labelselector.yaml", "Pod Topology Spread Constraints", scorecard.GradeCritical)
+	testExpectedScore(
+		t,
+		"pod-topology-spread-constraints-no-labelselector.yaml",
+		"Pod Topology Spread Constraints",
+		scorecard.GradeCritical,
+	)
 }
 
-func TestPodTopologySpreadContraintsInvalidMaxSkew(t *testing.T) {
+func TestPodTopologySpreadConstraintsInvalidMaxSkew(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "pod-topology-spread-constraints-invalid-maxskew.yaml", "Pod Topology Spread Constraints", scorecard.GradeCritical)
+	testExpectedScore(
+		t,
+		"pod-topology-spread-constraints-invalid-maxskew.yaml",
+		"Pod Topology Spread Constraints",
+		scorecard.GradeCritical,
+	)
 }
 
-func TestPodTopologySpreadContraintsInvalidMinDomains(t *testing.T) {
+func TestPodTopologySpreadConstraintsInvalidMinDomains(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "pod-topology-spread-constraints-invalid-mindomains.yaml", "Pod Topology Spread Constraints", scorecard.GradeCritical)
+	testExpectedScore(
+		t,
+		"pod-topology-spread-constraints-invalid-mindomains.yaml",
+		"Pod Topology Spread Constraints",
+		scorecard.GradeCritical,
+	)
 }
 
-func TestPodTopologySpreadContraintsNoTopologyKey(t *testing.T) {
+func TestPodTopologySpreadConstraintsNoTopologyKey(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "pod-topology-spread-constraints-no-topologykey.yaml", "Pod Topology Spread Constraints", scorecard.GradeCritical)
+	testExpectedScore(
+		t,
+		"pod-topology-spread-constraints-no-topologykey.yaml",
+		"Pod Topology Spread Constraints",
+		scorecard.GradeCritical,
+	)
 }
 
-func TestPodTopologySpreadContraintsInvalidDirective(t *testing.T) {
+func TestPodTopologySpreadConstraintsInvalidDirective(t *testing.T) {
 	t.Parallel()
-	testExpectedScore(t, "pod-topology-spread-constraints-invalid-whenunsatisfiable.yaml", "Pod Topology Spread Constraints", scorecard.GradeCritical)
+	testExpectedScore(
+		t,
+		"pod-topology-spread-constraints-invalid-whenunsatisfiable.yaml",
+		"Pod Topology Spread Constraints",
+		scorecard.GradeCritical,
+	)
 }

@@ -16,7 +16,13 @@ type Options struct {
 	Namespace string
 }
 
-func Register(allChecks *checks.Checks, netpols ks.NetworkPolicies, pods ks.Pods, podspecers ks.PodSpeccers, options Options) {
+func Register(
+	allChecks *checks.Checks,
+	netpols ks.NetworkPolicies,
+	pods ks.Pods,
+	podspecers ks.PodSpeccers,
+	options Options,
+) {
 	allChecks.RegisterPodCheck(
 		"Pod NetworkPolicy",
 		`Makes sure that all Pods are targeted by a NetworkPolicy`,
@@ -31,7 +37,10 @@ func Register(allChecks *checks.Checks, netpols ks.NetworkPolicies, pods ks.Pods
 
 // podHasNetworkPolicy returns a function that tests that all pods have matching NetworkPolicies
 // podHasNetworkPolicy takes a list of all defined NetworkPolicies as input
-func podHasNetworkPolicy(allNetpols []ks.NetworkPolicy, options Options) func(ks.PodSpecer) (scorecard.TestScore, error) {
+func podHasNetworkPolicy(
+	allNetpols []ks.NetworkPolicy,
+	options Options,
+) func(ks.PodSpecer) (scorecard.TestScore, error) {
 	verbose := false
 	return func(ps ks.PodSpecer) (score scorecard.TestScore, err error) {
 		hasMatchingEgressNetpol := false
@@ -92,7 +101,7 @@ func podHasNetworkPolicy(allNetpols []ks.NetworkPolicy, options Options) func(ks
 					// you must specify a policyTypes value that include "Egress" (since such a policy would not include
 					// an Egress section and would otherwise default to just [ "Ingress" ]).
 
-					if netPol.Spec.PolicyTypes == nil || len(netPol.Spec.PolicyTypes) == 0 {
+					if len(netPol.Spec.PolicyTypes) == 0 {
 						hasMatchingIngressNetpol = true
 						if len(netPol.Spec.Egress) > 0 {
 							hasMatchingEgressNetpol = true
@@ -116,20 +125,36 @@ func podHasNetworkPolicy(allNetpols []ks.NetworkPolicy, options Options) func(ks
 			score.Grade = scorecard.GradeAllOK
 		case hasMatchingEgressNetpol && !hasMatchingIngressNetpol:
 			score.Grade = scorecard.GradeWarning
-			score.AddComment("", "The pod does not have a matching ingress NetworkPolicy", "Add a ingress policy to the pods NetworkPolicy")
+			score.AddComment(
+				"",
+				"The pod does not have a matching ingress NetworkPolicy",
+				"Add a ingress policy to the pods NetworkPolicy",
+			)
 		case hasMatchingIngressNetpol && !hasMatchingEgressNetpol:
 			score.Grade = scorecard.GradeWarning
-			score.AddComment("", "The pod does not have a matching egress NetworkPolicy", "Add a egress policy to the pods NetworkPolicy")
+			score.AddComment(
+				"",
+				"The pod does not have a matching egress NetworkPolicy",
+				"Add a egress policy to the pods NetworkPolicy",
+			)
 		default:
 			score.Grade = scorecard.GradeCritical
-			score.AddComment("", "The pod does not have a matching NetworkPolicy", "Create a NetworkPolicy that targets this pod to control who/what can communicate with this pod. Note, this feature needs to be supported by the CNI implementation used in the Kubernetes cluster to have an effect.")
+			score.AddComment(
+				"",
+				"The pod does not have a matching NetworkPolicy",
+				"Create a NetworkPolicy that targets this pod to control who/what can communicate with this pod. Note, this feature needs to be supported by the CNI implementation used in the Kubernetes cluster to have an effect.",
+			)
 		}
 
 		return
 	}
 }
 
-func networkPolicyTargetsPod(pods []ks.Pod, podspecers []ks.PodSpecer, options Options) func(networkingv1.NetworkPolicy) (scorecard.TestScore, error) {
+func networkPolicyTargetsPod(
+	pods []ks.Pod,
+	podspecers []ks.PodSpecer,
+	options Options,
+) func(networkingv1.NetworkPolicy) (scorecard.TestScore, error) {
 	verbose := false
 	return func(netpol networkingv1.NetworkPolicy) (score scorecard.TestScore, err error) {
 		hasMatch := false
@@ -168,7 +193,13 @@ func networkPolicyTargetsPod(pods []ks.Pod, podspecers []ks.PodSpecer, options O
 
 			if selector, err := metav1.LabelSelectorAsSelector(&netpol.Spec.PodSelector); err == nil {
 				if verbose {
-					fmt.Printf("policy/%s => checking %s (%s) against selector=%s\n", netpol.Name, pod.Name, pod.Labels, selector.String())
+					fmt.Printf(
+						"policy/%s => checking %s (%s) against selector=%s\n",
+						netpol.Name,
+						pod.Name,
+						pod.Labels,
+						selector.String(),
+					)
 				}
 				if selector.Matches(internal.MapLabels(pod.Labels)) {
 					if verbose {
@@ -199,10 +230,15 @@ func networkPolicyTargetsPod(pods []ks.Pod, podspecers []ks.PodSpecer, options O
 					if verbose {
 						fmt.Printf(
 							"policy/%s => checking %s (%s) against selector=%s\n",
-							netpol.Name, pod.GetPodTemplateSpec().Name, pod.GetPodTemplateSpec().Labels, selector.String(),
+							netpol.Name,
+							pod.GetPodTemplateSpec().Name,
+							pod.GetPodTemplateSpec().Labels,
+							selector.String(),
 						)
 					}
-					if selector.Matches(internal.MapLabels(pod.GetPodTemplateSpec().Labels)) {
+					if selector.Matches(
+						internal.MapLabels(pod.GetPodTemplateSpec().Labels),
+					) {
 						if verbose {
 							fmt.Printf("policy/%s => LABEL match\n", netpol.Name)
 						}
@@ -217,7 +253,7 @@ func networkPolicyTargetsPod(pods []ks.Pod, podspecers []ks.PodSpecer, options O
 			score.Grade = scorecard.GradeAllOK
 		} else {
 			score.Grade = scorecard.GradeCritical
-			score.AddComment("", "The NetworkPolicys selector doesn't match any pods", "")
+			score.AddComment("", "The NetworkPolicies selector doesn't match any pods", "")
 		}
 
 		return

@@ -7,7 +7,10 @@ import (
 	ks "github.com/zegl/kube-score/domain"
 )
 
-func (so *ScoredObject) isEnabled(check ks.Check, annotations, childAnnotations map[string]string) bool {
+func (so *ScoredObject) isEnabled(
+	check ks.Check,
+	annotations, childAnnotations map[string]string,
+) bool {
 	isIn := func(annotations map[string]string, csv string, key string) bool {
 		// see if the check is explicitly allowed or denied
 		if checkAnnotation, ok := annotations[fmt.Sprintf("kube-score/%s", check.ID)]; ok {
@@ -42,16 +45,20 @@ func (so *ScoredObject) isEnabled(check ks.Check, annotations, childAnnotations 
 		return false
 	}
 
-	if childAnnotations != nil && so.useIgnoreChecksAnnotation && isIn(childAnnotations, childAnnotations[ignoredChecksAnnotation], check.ID) {
+	if childAnnotations != nil && so.useIgnoreChecksAnnotation &&
+		isIn(childAnnotations, childAnnotations[ignoredChecksAnnotation], check.ID) {
 		return false
 	}
-	if childAnnotations != nil && so.useOptionalChecksAnnotation && isIn(childAnnotations, childAnnotations[optionalChecksAnnotation], check.ID) {
+	if childAnnotations != nil && so.useOptionalChecksAnnotation &&
+		isIn(childAnnotations, childAnnotations[optionalChecksAnnotation], check.ID) {
 		return true
 	}
-	if so.useIgnoreChecksAnnotation && isIn(annotations, annotations[ignoredChecksAnnotation], check.ID) {
+	if so.useIgnoreChecksAnnotation &&
+		isIn(annotations, annotations[ignoredChecksAnnotation], check.ID) {
 		return false
 	}
-	if so.useOptionalChecksAnnotation && isIn(annotations, annotations[optionalChecksAnnotation], check.ID) {
+	if so.useOptionalChecksAnnotation &&
+		isIn(annotations, annotations[optionalChecksAnnotation], check.ID) {
 		return true
 	}
 

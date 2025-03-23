@@ -14,7 +14,10 @@ func (l MapLabels) Get(key string) string {
 	return l[key]
 }
 
-func LabelSelectorMatchesLabels(selectorLabels map[string]string, labels map[string]string) bool {
+func LabelSelectorMatchesLabels(
+	selectorLabels map[string]string,
+	labels map[string]string,
+) bool {
 	labelSelector := &metav1.LabelSelector{
 		MatchLabels: selectorLabels,
 	}

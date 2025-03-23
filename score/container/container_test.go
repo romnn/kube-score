@@ -186,10 +186,18 @@ func TestFailBothContainerResourceRequestsEqualLimits(t *testing.T) {
 	assert.Len(t, s.Comments, 2)
 	assert.Equal(t, "foo", s.Comments[0].Path)
 	assert.Equal(t, "CPU requests does not match limits", s.Comments[0].Summary)
-	assert.Equal(t, "Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.cpu == resources.limits.cpu", s.Comments[0].Description)
+	assert.Equal(
+		t,
+		"Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.cpu == resources.limits.cpu",
+		s.Comments[0].Description,
+	)
 	assert.Equal(t, "foo", s.Comments[1].Path)
 	assert.Equal(t, "Memory requests does not match limits", s.Comments[1].Summary)
-	assert.Equal(t, "Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.memory == resources.limits.memory", s.Comments[1].Description)
+	assert.Equal(
+		t,
+		"Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.memory == resources.limits.memory",
+		s.Comments[1].Description,
+	)
 }
 
 func TestFailCpuInitContainerResourceRequestsEqualLimits(t *testing.T) {
@@ -238,7 +246,11 @@ func TestFailCpuInitContainerResourceRequestsEqualLimits(t *testing.T) {
 	assert.Len(t, s.Comments, 1)
 	assert.Equal(t, "init", s.Comments[0].Path)
 	assert.Equal(t, "CPU requests does not match limits", s.Comments[0].Summary)
-	assert.Equal(t, "Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.cpu == resources.limits.cpu", s.Comments[0].Description)
+	assert.Equal(
+		t,
+		"Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.cpu == resources.limits.cpu",
+		s.Comments[0].Description,
+	)
 }
 
 func TestOkAllCPURequestsEqualLimits(t *testing.T) {
@@ -383,7 +395,11 @@ func TestFailContainerCPURequestsEqualLimits(t *testing.T) {
 	assert.Len(t, s.Comments, 1)
 	assert.Equal(t, "foo", s.Comments[0].Path)
 	assert.Equal(t, "CPU requests does not match limits", s.Comments[0].Summary)
-	assert.Equal(t, "Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.cpu == resources.limits.cpu", s.Comments[0].Description)
+	assert.Equal(
+		t,
+		"Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.cpu == resources.limits.cpu",
+		s.Comments[0].Description,
+	)
 }
 
 func TestFailInitContainerCPURequestsEqualLimits(t *testing.T) {
@@ -430,7 +446,11 @@ func TestFailInitContainerCPURequestsEqualLimits(t *testing.T) {
 	assert.Len(t, s.Comments, 1)
 	assert.Equal(t, "init", s.Comments[0].Path)
 	assert.Equal(t, "CPU requests does not match limits", s.Comments[0].Summary)
-	assert.Equal(t, "Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.cpu == resources.limits.cpu", s.Comments[0].Description)
+	assert.Equal(
+		t,
+		"Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.cpu == resources.limits.cpu",
+		s.Comments[0].Description,
+	)
 }
 
 func TestOkContainerMemoryResourceRequestsEqualLimits(t *testing.T) {
@@ -575,7 +595,11 @@ func TestFailContainerMemoryRequestsEqualLimits(t *testing.T) {
 	assert.Len(t, s.Comments, 1)
 	assert.Equal(t, "foo", s.Comments[0].Path)
 	assert.Equal(t, "Memory requests does not match limits", s.Comments[0].Summary)
-	assert.Equal(t, "Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.memory == resources.limits.memory", s.Comments[0].Description)
+	assert.Equal(
+		t,
+		"Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.memory == resources.limits.memory",
+		s.Comments[0].Description,
+	)
 }
 
 func TestFailInitContainerMemoryRequestsEqualLimits(t *testing.T) {
@@ -622,5 +646,9 @@ func TestFailInitContainerMemoryRequestsEqualLimits(t *testing.T) {
 	assert.Len(t, s.Comments, 1)
 	assert.Equal(t, "init", s.Comments[0].Path)
 	assert.Equal(t, "Memory requests does not match limits", s.Comments[0].Summary)
-	assert.Equal(t, "Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.memory == resources.limits.memory", s.Comments[0].Description)
+	assert.Equal(
+		t,
+		"Having equal requests and limits is recommended to avoid resource DDOS of the node during spikes. Set resources.requests.memory == resources.limits.memory",
+		s.Comments[0].Description,
+	)
 }

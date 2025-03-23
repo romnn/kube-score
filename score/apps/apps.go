@@ -14,18 +14,48 @@ import (
 	"github.com/zegl/kube-score/scorecard"
 )
 
-func Register(allChecks *checks.Checks, allHPAs []ks.HpaTargeter, allServices []ks.Service) {
-	allChecks.RegisterDeploymentCheck("Deployment has host PodAntiAffinity", "Makes sure that a podAntiAffinity has been set that prevents multiple pods from being scheduled on the same node. https://kubernetes.io/docs/concepts/configuration/assign-pod-node/", deploymentHasAntiAffinity)
-	allChecks.RegisterStatefulSetCheck("StatefulSet has host PodAntiAffinity", "Makes sure that a podAntiAffinity has been set that prevents multiple pods from being scheduled on the same node. https://kubernetes.io/docs/concepts/configuration/assign-pod-node/", statefulsetHasAntiAffinity)
+func Register(
+	allChecks *checks.Checks,
+	allHPAs []ks.HpaTargeter,
+	allServices []ks.Service,
+) {
+	allChecks.RegisterDeploymentCheck(
+		"Deployment has host PodAntiAffinity",
+		"Makes sure that a podAntiAffinity has been set that prevents multiple pods from being scheduled on the same node. https://kubernetes.io/docs/concepts/configuration/assign-pod-node/",
+		deploymentHasAntiAffinity,
+	)
+	allChecks.RegisterStatefulSetCheck(
+		"StatefulSet has host PodAntiAffinity",
+		"Makes sure that a podAntiAffinity has been set that prevents multiple pods from being scheduled on the same node. https://kubernetes.io/docs/concepts/configuration/assign-pod-node/",
+		statefulsetHasAntiAffinity,
+	)
 
-	allChecks.RegisterDeploymentCheck("Deployment targeted by HPA does not have replicas configured", "Makes sure that Deployments using a HorizontalPodAutoscaler doesn't have a statically configured replica count set", hpaDeploymentNoReplicas(allHPAs))
-	allChecks.RegisterStatefulSetCheck("StatefulSet has ServiceName", "Makes sure that StatefulSets have an existing headless serviceName.", statefulsetHasServiceName(allServices))
+	allChecks.RegisterDeploymentCheck(
+		"Deployment targeted by HPA does not have replicas configured",
+		"Makes sure that Deployments using a HorizontalPodAutoscaler doesn't have a statically configured replica count set",
+		hpaDeploymentNoReplicas(allHPAs),
+	)
+	allChecks.RegisterStatefulSetCheck(
+		"StatefulSet has ServiceName",
+		"Makes sure that StatefulSets have an existing headless serviceName.",
+		statefulsetHasServiceName(allServices),
+	)
 
-	allChecks.RegisterDeploymentCheck("Deployment Pod Selector labels match template metadata labels", "Ensure the StatefulSet selector labels match the template metadata labels.", deploymentSelectorLabelsMatching)
-	allChecks.RegisterStatefulSetCheck("StatefulSet Pod Selector labels match template metadata labels", "Ensure the StatefulSet selector labels match the template metadata labels.", statefulSetSelectorLabelsMatching)
+	allChecks.RegisterDeploymentCheck(
+		"Deployment Pod Selector labels match template metadata labels",
+		"Ensure the StatefulSet selector labels match the template metadata labels.",
+		deploymentSelectorLabelsMatching,
+	)
+	allChecks.RegisterStatefulSetCheck(
+		"StatefulSet Pod Selector labels match template metadata labels",
+		"Ensure the StatefulSet selector labels match the template metadata labels.",
+		statefulSetSelectorLabelsMatching,
+	)
 }
 
-func hpaDeploymentNoReplicas(allHPAs []ks.HpaTargeter) func(deployment appsv1.Deployment) (scorecard.TestScore, error) {
+func hpaDeploymentNoReplicas(
+	allHPAs []ks.HpaTargeter,
+) func(deployment appsv1.Deployment) (scorecard.TestScore, error) {
 	return func(deployment appsv1.Deployment) (score scorecard.TestScore, err error) {
 		// If is targeted by a HPA
 		for _, hpa := range allHPAs {
@@ -41,31 +71,49 @@ func hpaDeploymentNoReplicas(allHPAs []ks.HpaTargeter) func(deployment appsv1.De
 				}
 
 				score.Grade = scorecard.GradeCritical
-				score.AddComment("", "The deployment is targeted by a HPA, but a static replica count is configured in the DeploymentSpec", "When replicas are both statically set and managed by the HPA, the replicas will be changed to the statically configured count when the spec is applied, even if the HPA wants the replica count to be higher.")
+				score.AddComment(
+					"",
+					"The deployment is targeted by a HPA, but a static replica count is configured in the DeploymentSpec",
+					"When replicas are both statically set and managed by the HPA, the replicas will be changed to the statically configured count when the spec is applied, even if the HPA wants the replica count to be higher.",
+				)
 				return
 			}
 		}
 
 		score.Grade = scorecard.GradeAllOK
 		score.Skipped = true
-		score.AddComment("", "Skipped because the deployment is not targeted by a HorizontalPodAutoscaler", "")
+		score.AddComment(
+			"",
+			"Skipped because the deployment is not targeted by a HorizontalPodAutoscaler",
+			"",
+		)
 		return
 	}
 }
 
-func deploymentHasAntiAffinity(deployment appsv1.Deployment) (score scorecard.TestScore, err error) {
+func deploymentHasAntiAffinity(
+	deployment appsv1.Deployment,
+) (score scorecard.TestScore, err error) {
 	// Ignore if the deployment only has a single replica
 	// If replicas is not explicitly set, we'll still warn if the anti affinity is missing
 	// as that might indicate use of a Horizontal Pod Autoscaler
 	if deployment.Spec.Replicas != nil && *deployment.Spec.Replicas < 2 {
 		score.Skipped = true
-		score.AddComment("", "Skipped because the deployment has less than 2 replicas", "")
+		score.AddComment(
+			"",
+			"Skipped because the deployment has less than 2 replicas",
+			"",
+		)
 		return
 	}
 
 	warn := func() {
 		score.Grade = scorecard.GradeWarning
-		score.AddComment("", "Deployment does not have a host podAntiAffinity set", "It's recommended to set a podAntiAffinity that stops multiple pods from a deployment from being scheduled on the same node. This increases availability in case the node becomes unavailable.")
+		score.AddComment(
+			"",
+			"Deployment does not have a host podAntiAffinity set",
+			"It's recommended to set a podAntiAffinity that stops multiple pods from a deployment from being scheduled on the same node. This increases availability in case the node becomes unavailable.",
+		)
 	}
 
 	affinity := deployment.Spec.Template.Spec.Affinity
@@ -85,19 +133,29 @@ func deploymentHasAntiAffinity(deployment appsv1.Deployment) (score scorecard.Te
 	return
 }
 
-func statefulsetHasAntiAffinity(statefulset appsv1.StatefulSet) (score scorecard.TestScore, err error) {
+func statefulsetHasAntiAffinity(
+	statefulset appsv1.StatefulSet,
+) (score scorecard.TestScore, err error) {
 	// Ignore if the statefulset only has a single replica
 	// If replicas is not explicitly set, we'll still warn if the anti affinity is missing
 	// as that might indicate use of a Horizontal Pod Autoscaler
 	if statefulset.Spec.Replicas != nil && *statefulset.Spec.Replicas < 2 {
 		score.Skipped = true
-		score.AddComment("", "Skipped because the statefulset has less than 2 replicas", "")
+		score.AddComment(
+			"",
+			"Skipped because the statefulset has less than 2 replicas",
+			"",
+		)
 		return
 	}
 
 	warn := func() {
 		score.Grade = scorecard.GradeWarning
-		score.AddComment("", "StatefulSet does not have a host podAntiAffinity set", "It's recommended to set a podAntiAffinity that stops multiple pods from a statefulset from being scheduled on the same node. This increases availability in case the node becomes unavailable.")
+		score.AddComment(
+			"",
+			"StatefulSet does not have a host podAntiAffinity set",
+			"It's recommended to set a podAntiAffinity that stops multiple pods from a statefulset from being scheduled on the same node. This increases availability in case the node becomes unavailable.",
+		)
 	}
 
 	affinity := statefulset.Spec.Template.Spec.Affinity
@@ -151,7 +209,9 @@ func hasPodAntiAffinity(selfLabels internal.MapLabels, affinity *corev1.Affinity
 	return false
 }
 
-func statefulsetHasServiceName(allServices []ks.Service) func(statefulset appsv1.StatefulSet) (scorecard.TestScore, error) {
+func statefulsetHasServiceName(
+	allServices []ks.Service,
+) func(statefulset appsv1.StatefulSet) (scorecard.TestScore, error) {
 	return func(statefulset appsv1.StatefulSet) (score scorecard.TestScore, err error) {
 		for _, service := range allServices {
 			if service.Service().Namespace != statefulset.Namespace ||
@@ -170,43 +230,71 @@ func statefulsetHasServiceName(allServices []ks.Service) func(statefulset appsv1
 		}
 
 		score.Grade = scorecard.GradeCritical
-		score.AddComment("", "StatefulSet does not have a valid serviceName", "StatefulSets currently require a Headless Service to be responsible for the network identity of the Pods. You are responsible for creating this Service. https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#limitations")
+		score.AddComment(
+			"",
+			"StatefulSet does not have a valid serviceName",
+			"StatefulSets currently require a Headless Service to be responsible for the network identity of the Pods. You are responsible for creating this Service. https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#limitations",
+		)
 		return
 	}
 }
 
-func statefulSetSelectorLabelsMatching(statefulset appsv1.StatefulSet) (score scorecard.TestScore, err error) {
+func statefulSetSelectorLabelsMatching(
+	statefulset appsv1.StatefulSet,
+) (score scorecard.TestScore, err error) {
 	selector, err := metav1.LabelSelectorAsSelector(statefulset.Spec.Selector)
 	if err != nil {
 		score.Grade = scorecard.GradeCritical
-		score.AddComment("", "StatefulSet selector labels are not matching template metadata labels", fmt.Sprintf("Invalid selector: %s", err))
+		score.AddComment(
+			"",
+			"StatefulSet selector labels are not matching template metadata labels",
+			fmt.Sprintf("Invalid selector: %s", err),
+		)
 		return
 	}
 
-	if selector.Matches(internal.MapLabels(statefulset.Spec.Template.GetObjectMeta().GetLabels())) {
+	if selector.Matches(
+		internal.MapLabels(statefulset.Spec.Template.GetObjectMeta().GetLabels()),
+	) {
 		score.Grade = scorecard.GradeAllOK
 		return
 	}
 
 	score.Grade = scorecard.GradeCritical
-	score.AddComment("", "StatefulSet selector labels not matching template metadata labels", "StatefulSets require `.spec.selector` to match `.spec.template.metadata.labels`. https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-selector")
+	score.AddComment(
+		"",
+		"StatefulSet selector labels not matching template metadata labels",
+		"StatefulSets require `.spec.selector` to match `.spec.template.metadata.labels`. https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-selector",
+	)
 	return
 }
 
-func deploymentSelectorLabelsMatching(deployment appsv1.Deployment) (score scorecard.TestScore, err error) {
+func deploymentSelectorLabelsMatching(
+	deployment appsv1.Deployment,
+) (score scorecard.TestScore, err error) {
 	selector, err := metav1.LabelSelectorAsSelector(deployment.Spec.Selector)
 	if err != nil {
 		score.Grade = scorecard.GradeCritical
-		score.AddComment("", "Deployment selector labels are not matching template metadata labels", fmt.Sprintf("Invalid selector: %s", err))
+		score.AddComment(
+			"",
+			"Deployment selector labels are not matching template metadata labels",
+			fmt.Sprintf("Invalid selector: %s", err),
+		)
 		return
 	}
 
-	if selector.Matches(internal.MapLabels(deployment.Spec.Template.GetObjectMeta().GetLabels())) {
+	if selector.Matches(
+		internal.MapLabels(deployment.Spec.Template.GetObjectMeta().GetLabels()),
+	) {
 		score.Grade = scorecard.GradeAllOK
 		return
 	}
 
 	score.Grade = scorecard.GradeCritical
-	score.AddComment("", "Deployment selector labels not matching template metadata labels", "Deployment require `.spec.selector` to match `.spec.template.metadata.labels`. https://kubernetes.io/docs/concepts/workloads/controllers/deployment/")
+	score.AddComment(
+		"",
+		"Deployment selector labels not matching template metadata labels",
+		"Deployment require `.spec.selector` to match `.spec.template.metadata.labels`. https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+	)
 	return
 }

@@ -11,32 +11,49 @@ import (
 )
 
 func Register(allChecks *checks.Checks, all ks.AllTypes) {
-	allChecks.RegisterDeploymentCheck("Deployment Strategy", `Makes sure that all Deployments targeted by service use RollingUpdate strategy`, deploymentRolloutStrategy(all.Services()))
-	allChecks.RegisterDeploymentCheck("Deployment Replicas", `Makes sure that Deployment has multiple replicas`, deploymentReplicas(all.Services(), all.HorizontalPodAutoscalers()))
+	allChecks.RegisterDeploymentCheck(
+		"Deployment Strategy",
+		`Makes sure that all Deployments targeted by service use RollingUpdate strategy`,
+		deploymentRolloutStrategy(all.Services()),
+	)
+	allChecks.RegisterDeploymentCheck(
+		"Deployment Replicas",
+		`Makes sure that Deployment has multiple replicas`,
+		deploymentReplicas(all.Services(), all.HorizontalPodAutoscalers()),
+	)
 }
 
 // deploymentRolloutStrategy checks if a Deployment has the update strategy on RollingUpdate if targeted by a service
-func deploymentRolloutStrategy(svcs []ks.Service) func(deployment v1.Deployment) (scorecard.TestScore, error) {
+func deploymentRolloutStrategy(
+	svcs []ks.Service,
+) func(deployment v1.Deployment) (scorecard.TestScore, error) {
 	svcsInNamespace := make(map[string][]map[string]string)
 	for _, s := range svcs {
 		svc := s.Service()
 		if _, ok := svcsInNamespace[svc.Namespace]; !ok {
 			svcsInNamespace[svc.Namespace] = []map[string]string{}
 		}
-		svcsInNamespace[svc.Namespace] = append(svcsInNamespace[svc.Namespace], svc.Spec.Selector)
+		svcsInNamespace[svc.Namespace] = append(
+			svcsInNamespace[svc.Namespace],
+			svc.Spec.Selector,
+		)
 	}
 	return func(deployment v1.Deployment) (score scorecard.TestScore, err error) {
 		referencedByService := false
 
 		for _, svcSelector := range svcsInNamespace[deployment.Namespace] {
-			if internal.LabelSelectorMatchesLabels(svcSelector, deployment.Spec.Template.Labels) {
+			if internal.LabelSelectorMatchesLabels(
+				svcSelector,
+				deployment.Spec.Template.Labels,
+			) {
 				referencedByService = true
 				break
 			}
 		}
 
 		if referencedByService {
-			if deployment.Spec.Strategy.Type == v1.RollingUpdateDeploymentStrategyType || deployment.Spec.Strategy.Type == "" {
+			if deployment.Spec.Strategy.Type == v1.RollingUpdateDeploymentStrategyType ||
+				deployment.Spec.Strategy.Type == "" {
 				score.Grade = scorecard.GradeAllOK
 			} else {
 				score.Grade = scorecard.GradeWarning
@@ -52,14 +69,20 @@ func deploymentRolloutStrategy(svcs []ks.Service) func(deployment v1.Deployment)
 }
 
 // deploymentReplicas checks if a Deployment has >= 2 replicas if not (targeted by service || has HorizontalPodAutoscaler)
-func deploymentReplicas(svcs []ks.Service, hpas []ks.HpaTargeter) func(deployment v1.Deployment) (scorecard.TestScore, error) {
+func deploymentReplicas(
+	svcs []ks.Service,
+	hpas []ks.HpaTargeter,
+) func(deployment v1.Deployment) (scorecard.TestScore, error) {
 	svcsInNamespace := make(map[string][]map[string]string)
 	for _, s := range svcs {
 		svc := s.Service()
 		if _, ok := svcsInNamespace[svc.Namespace]; !ok {
 			svcsInNamespace[svc.Namespace] = []map[string]string{}
 		}
-		svcsInNamespace[svc.Namespace] = append(svcsInNamespace[svc.Namespace], svc.Spec.Selector)
+		svcsInNamespace[svc.Namespace] = append(
+			svcsInNamespace[svc.Namespace],
+			svc.Spec.Selector,
+		)
 	}
 	hpasInNamespace := make(map[string][]autoscalingv1.CrossVersionObjectReference)
 	for _, hpa := range hpas {
@@ -68,7 +91,10 @@ func deploymentReplicas(svcs []ks.Service, hpas []ks.HpaTargeter) func(deploymen
 		if _, ok := hpasInNamespace[hpaMeta.Namespace]; !ok {
 			hpasInNamespace[hpaMeta.Namespace] = []autoscalingv1.CrossVersionObjectReference{}
 		}
-		hpasInNamespace[hpaMeta.Namespace] = append(hpasInNamespace[hpaMeta.Namespace], hpaTarget)
+		hpasInNamespace[hpaMeta.Namespace] = append(
+			hpasInNamespace[hpaMeta.Namespace],
+			hpaTarget,
+		)
 	}
 
 	return func(deployment v1.Deployment) (score scorecard.TestScore, err error) {
@@ -76,28 +102,40 @@ func deploymentReplicas(svcs []ks.Service, hpas []ks.HpaTargeter) func(deploymen
 		hasHPA := false
 
 		for _, svcSelector := range svcsInNamespace[deployment.Namespace] {
-			if internal.LabelSelectorMatchesLabels(svcSelector, deployment.Spec.Template.Labels) {
+			if internal.LabelSelectorMatchesLabels(
+				svcSelector,
+				deployment.Spec.Template.Labels,
+			) {
 				referencedByService = true
 				break
 			}
 		}
 
 		for _, hpaTarget := range hpasInNamespace[deployment.Namespace] {
-			if deployment.TypeMeta.APIVersion == hpaTarget.APIVersion &&
-				deployment.TypeMeta.Kind == hpaTarget.Kind &&
-				deployment.ObjectMeta.Name == hpaTarget.Name {
+			if deployment.APIVersion == hpaTarget.APIVersion &&
+				deployment.Kind == hpaTarget.Kind &&
+				deployment.Name == hpaTarget.Name {
 				hasHPA = true
 				break
 			}
 		}
 
-		if !referencedByService {
+		switch {
+		case !referencedByService:
 			score.Skipped = true
-			score.AddComment("", "Skipped as the Deployment is not targeted by service", "")
-		} else if hasHPA {
+			score.AddComment(
+				"",
+				"Skipped as the Deployment is not targeted by service",
+				"",
+			)
+		case hasHPA:
 			score.Skipped = true
-			score.AddComment("", "Skipped as the Deployment is controlled by a HorizontalPodAutoscaler", "")
-		} else {
+			score.AddComment(
+				"",
+				"Skipped as the Deployment is controlled by a HorizontalPodAutoscaler",
+				"",
+			)
+		default:
 			if ptr.Deref(deployment.Spec.Replicas, 1) >= 2 {
 				score.Grade = scorecard.GradeAllOK
 			} else {

@@ -15,7 +15,12 @@ import (
 	"github.com/zegl/kube-score/scorecard"
 )
 
-func Human(scoreCard *scorecard.Scorecard, verboseOutput int, termWidth int, useColors bool) (io.Reader, error) {
+func Human(
+	scoreCard *scorecard.Scorecard,
+	verboseOutput int,
+	termWidth int,
+	useColors bool,
+) (io.Reader, error) {
 	// Print the items sorted by scorecard key
 	var keys []string
 	for k := range *scoreCard {
@@ -33,14 +38,19 @@ func Human(scoreCard *scorecard.Scorecard, verboseOutput int, termWidth int, use
 
 		// Headers for each object
 		var writtenHeaderChars int
-		writtenHeaderChars, _ = color.New(color.FgMagenta).Fprintf(w, "%s/%s %s", scoredObject.TypeMeta.APIVersion, scoredObject.TypeMeta.Kind, scoredObject.ObjectMeta.Name)
+		writtenHeaderChars, _ = color.New(color.FgMagenta).
+			Fprintf(w, "%s/%s %s", scoredObject.TypeMeta.APIVersion, scoredObject.TypeMeta.Kind, scoredObject.ObjectMeta.Name)
 		if scoredObject.ObjectMeta.Namespace != "" {
-			written2, _ := color.New(color.FgMagenta).Fprintf(w, " in %s", scoredObject.ObjectMeta.Namespace)
+			written2, _ := color.New(color.FgMagenta).
+				Fprintf(w, " in %s", scoredObject.ObjectMeta.Namespace)
 			writtenHeaderChars += written2
 		}
 
 		// Adjust to termsize
-		_, err := fmt.Fprint(w, safeRepeat(" ", min(80, termWidth)-writtenHeaderChars-2))
+		_, err := fmt.Fprint(
+			w,
+			safeRepeat(" ", min(80, termWidth)-writtenHeaderChars-2),
+		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to write terminal padding: %w", err)
 		}
@@ -60,7 +70,8 @@ func Human(scoreCard *scorecard.Scorecard, verboseOutput int, termWidth int, use
 		// Display file name if the object has any warnings or criticals
 		if scoredObject.AnyBelowOrEqualToGrade(scorecard.GradeWarning) {
 			if scoredObject.FileLocation.Name != "" {
-				_, _ = color.New(color.FgHiBlack).Fprintf(w, "    path=%s\n", scoredObject.FileLocation.Name)
+				_, _ = color.New(color.FgHiBlack).
+					Fprintf(w, "    path=%s\n", scoredObject.FileLocation.Name)
 			}
 		}
 
@@ -87,7 +98,11 @@ func Human(scoreCard *scorecard.Scorecard, verboseOutput int, termWidth int, use
 	return w, nil
 }
 
-func outputHumanStep(card scorecard.TestScore, verboseOutput int, termWidth int) io.Reader {
+func outputHumanStep(
+	card scorecard.TestScore,
+	verboseOutput int,
+	termWidth int,
+) io.Reader {
 	w := bytes.NewBufferString("")
 
 	// Only print skipped items if verbosity is at least 2
@@ -143,7 +158,12 @@ func outputHumanStep(card scorecard.TestScore, verboseOutput int, termWidth int)
 
 		if len(comment.DocumentationURL) > 0 {
 			fmt.Fprintln(w)
-			fmt.Fprintf(w, "%sMore information: %s", strings.Repeat(" ", 12), comment.DocumentationURL)
+			fmt.Fprintf(
+				w,
+				"%sMore information: %s",
+				strings.Repeat(" ", 12),
+				comment.DocumentationURL,
+			)
 		}
 
 		fmt.Fprintln(w)

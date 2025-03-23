@@ -20,10 +20,12 @@ func TestStatefulSetReplicas(t *testing.T) {
 		intptr(10): {scorecard.GradeCritical, false}, // failed
 	}
 
-	fn := statefulSetHas(nil)
+	fn := statefulSetHas(nil, Options{})
 
 	for replicas, expected := range cases {
-		res, err := fn(appsv1.StatefulSet{Spec: appsv1.StatefulSetSpec{Replicas: replicas}})
+		res, err := fn(
+			appsv1.StatefulSet{Spec: appsv1.StatefulSetSpec{Replicas: replicas}},
+		)
 		assert.Nil(t, err)
 
 		assert.Equal(t, expected.skipped, res.Skipped)
@@ -47,10 +49,12 @@ func TestDeploymentReplicas(t *testing.T) {
 		intptr(10): {scorecard.GradeCritical, false}, // failed
 	}
 
-	fn := deploymentHas(nil)
+	fn := deploymentHas(nil, Options{})
 
 	for replicas, expected := range cases {
-		res, err := fn(appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: replicas}})
+		res, err := fn(
+			appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: replicas}},
+		)
 		assert.Nil(t, err)
 
 		assert.Equal(t, expected.skipped, res.Skipped)

@@ -10,9 +10,13 @@ import (
 )
 
 func TestFileLocationHelm(t *testing.T) {
-	sc, err := testScore([]ks.NamedReader{testFile("linenumbers-helm.yaml")}, nil, &config.RunConfiguration{
-		KubernetesVersion: config.Semver{Major: 1, Minor: 18},
-	})
+	sc, err := testScore(
+		[]ks.NamedReader{testFile("linenumbers-helm.yaml")},
+		nil,
+		&config.RunConfiguration{
+			KubernetesVersion: config.Semver{Major: 1, Minor: 18},
+		},
+	)
 	assert.Nil(t, err)
 	for _, c := range sc {
 		assert.Equal(t, "app1/templates/deployment.yaml", c.FileLocation.Name)
@@ -22,9 +26,13 @@ func TestFileLocationHelm(t *testing.T) {
 }
 
 func TestFileLocation(t *testing.T) {
-	sc, err := testScore([]ks.NamedReader{testFile("linenumbers.yaml")}, nil, &config.RunConfiguration{
-		KubernetesVersion: config.Semver{Major: 1, Minor: 18},
-	})
+	sc, err := testScore(
+		[]ks.NamedReader{testFile("linenumbers.yaml")},
+		nil,
+		&config.RunConfiguration{
+			KubernetesVersion: config.Semver{Major: 1, Minor: 18},
+		},
+	)
 	assert.Nil(t, err)
 	for _, c := range sc {
 		assert.Equal(t, "testdata/linenumbers.yaml", c.FileLocation.Name)

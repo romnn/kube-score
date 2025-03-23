@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: deployment-preffered-anti-affinity
+  name: deployment-preferred-anti-affinity
 spec:
   replicas: 10
   template:
@@ -16,7 +16,7 @@ spec:
             podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  app: foo
+                  app: not-foo
               topologyKey: kubernetes.io/hostname
       containers:
       - name: foobar

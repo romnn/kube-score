@@ -25,7 +25,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func RegisterAllChecks(allObjects ks.AllTypes, checksConfig *checks.Config, runConfig *config.RunConfiguration) *checks.Checks {
+func RegisterAllChecks(
+	allObjects ks.AllTypes,
+	checksConfig *checks.Config,
+	runConfig *config.RunConfiguration,
+) *checks.Checks {
 	allChecks := checks.New(checksConfig)
 
 	deployment.Register(allChecks, allObjects)
@@ -36,10 +40,18 @@ func RegisterAllChecks(allObjects ks.AllTypes, checksConfig *checks.Config, runC
 		IgnoreContainerCpuLimitRequirement:    runConfig.IgnoreContainerCpuLimitRequirement,
 		IgnoreContainerMemoryLimitRequirement: runConfig.IgnoreContainerMemoryLimitRequirement,
 	})
-	disruptionbudget.Register(allChecks, allObjects)
-	networkpolicy.Register(allChecks, allObjects, allObjects, allObjects, networkpolicy.Options{
+	disruptionbudget.Register(allChecks, allObjects, disruptionbudget.Options{
 		Namespace: runConfig.Namespace,
 	})
+	networkpolicy.Register(
+		allChecks,
+		allObjects,
+		allObjects,
+		allObjects,
+		networkpolicy.Options{
+			Namespace: runConfig.Namespace,
+		},
+	)
 	probes.Register(allChecks, allObjects, probes.Options{
 		SkipInitContainers: runConfig.SkipInitContainers,
 	})
@@ -48,7 +60,11 @@ func RegisterAllChecks(allObjects ks.AllTypes, checksConfig *checks.Config, runC
 	})
 	service.Register(allChecks, allObjects, allObjects)
 	stable.Register(runConfig.KubernetesVersion, allChecks)
-	apps.Register(allChecks, allObjects.HorizontalPodAutoscalers(), allObjects.Services())
+	apps.Register(
+		allChecks,
+		allObjects.HorizontalPodAutoscalers(),
+		allObjects.Services(),
+	)
 	meta.Register(allChecks)
 	hpa.Register(allChecks, hpa.Options{
 		AllTargetableObjs: allObjects.Metas(),
@@ -82,7 +98,11 @@ func (p *podSpeccer) FileLocation() ks.FileLocation {
 
 // Score runs a pre-configured list of tests against the files defined in the configuration, and returns a scorecard.
 // Additional configuration and tuning parameters can be provided via the config.
-func Score(allObjects ks.AllTypes, allChecks *checks.Checks, cnf *config.RunConfiguration) (*scorecard.Scorecard, error) {
+func Score(
+	allObjects ks.AllTypes,
+	allChecks *checks.Checks,
+	cnf *config.RunConfiguration,
+) (*scorecard.Scorecard, error) {
 	if cnf == nil {
 		cnf = &config.RunConfiguration{}
 	}
@@ -133,7 +153,7 @@ func Score(allObjects ks.AllTypes, allChecks *checks.Checks, cnf *config.RunConf
 				objectMeta: pod.Pod().ObjectMeta,
 				spec:       podTemplateSpec,
 			})
-			o.Add(score, test.Check, pod, pod.Pod().ObjectMeta.Annotations)
+			o.Add(score, test.Check, pod, pod.Pod().Annotations)
 		}
 	}
 
@@ -160,35 +180,54 @@ func Score(allObjects ks.AllTypes, allChecks *checks.Checks, cnf *config.RunConf
 	}
 
 	for _, statefulset := range allObjects.StatefulSets() {
-		o := newObject(statefulset.StatefulSet().TypeMeta, statefulset.StatefulSet().ObjectMeta)
+		o := newObject(
+			statefulset.StatefulSet().TypeMeta,
+			statefulset.StatefulSet().ObjectMeta,
+		)
 		for _, test := range allChecks.StatefulSets() {
 			fn, err := test.Fn(statefulset.StatefulSet())
 			if err != nil {
 				return nil, err
 			}
-			o.Add(fn, test.Check, statefulset, statefulset.StatefulSet().ObjectMeta.Annotations)
+			o.Add(
+				fn,
+				test.Check,
+				statefulset,
+				statefulset.StatefulSet().Annotations,
+			)
 		}
 	}
 
 	for _, deployment := range allObjects.Deployments() {
-		o := newObject(deployment.Deployment().TypeMeta, deployment.Deployment().ObjectMeta)
+		o := newObject(
+			deployment.Deployment().TypeMeta,
+			deployment.Deployment().ObjectMeta,
+		)
 		for _, test := range allChecks.Deployments() {
 			res, err := test.Fn(deployment.Deployment())
 			if err != nil {
 				return nil, err
 			}
-			o.Add(res, test.Check, deployment, deployment.Deployment().ObjectMeta.Annotations)
+			o.Add(
+				res,
+				test.Check,
+				deployment,
+				deployment.Deployment().Annotations,
+			)
 		}
 	}
 
 	for _, netpol := range allObjects.NetworkPolicies() {
-		o := newObject(netpol.NetworkPolicy().TypeMeta, netpol.NetworkPolicy().ObjectMeta)
+		o := newObject(
+			netpol.NetworkPolicy().TypeMeta,
+			netpol.NetworkPolicy().ObjectMeta,
+		)
 		for _, test := range allChecks.NetworkPolicies() {
 			fn, err := test.Fn(netpol.NetworkPolicy())
 			if err != nil {
 				return nil, err
 			}
-			o.Add(fn, test.Check, netpol, netpol.NetworkPolicy().ObjectMeta.Annotations)
+			o.Add(fn, test.Check, netpol, netpol.NetworkPolicy().Annotations)
 		}
 	}
 

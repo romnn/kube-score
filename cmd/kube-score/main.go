@@ -82,7 +82,10 @@ Actions:
 	help	Print this message`+"\n\n", binName, binName)
 
 		if displayForMoreInfo {
-			usage += fmt.Sprintf(`Run "%s [action] --help" for more information about a particular command`, binName)
+			usage += fmt.Sprintf(
+				`Run "%s [action] --help" for more information about a particular command`,
+				binName,
+			)
 		}
 
 		if len(actionName) > 0 {
@@ -99,22 +102,84 @@ Actions:
 
 func scoreFiles(binName string, args []string) error {
 	fs := flag.NewFlagSet(binName, flag.ExitOnError)
-	exitOneOnWarning := fs.Bool("exit-one-on-warning", false, "Exit with code 1 in case of warnings")
-	skipInitContainers := fs.Bool("ignore-init-containers", false, "Ignores checks for init containers")
-	namespace := fs.StringP("namespace", "n", "", "Namespace to assume for resources without a namespace")
-	ignoreContainerCpuLimit := fs.Bool("ignore-container-cpu-limit", false, "Disables the requirement of setting a container CPU limit")
-	ignoreContainerMemoryLimit := fs.Bool("ignore-container-memory-limit", false, "Disables the requirement of setting a container memory limit")
-	verboseOutput := fs.CountP("verbose", "v", "Enable verbose output, can be set multiple times for increased verbosity.")
+	exitOneOnWarning := fs.Bool(
+		"exit-one-on-warning",
+		false,
+		"Exit with code 1 in case of warnings",
+	)
+	skipInitContainers := fs.Bool(
+		"ignore-init-containers",
+		false,
+		"Ignores checks for init containers",
+	)
+	namespace := fs.StringP(
+		"namespace",
+		"n",
+		"",
+		"Namespace to assume for resources without a namespace",
+	)
+	ignoreContainerCpuLimit := fs.Bool(
+		"ignore-container-cpu-limit",
+		false,
+		"Disables the requirement of setting a container CPU limit",
+	)
+	ignoreContainerMemoryLimit := fs.Bool(
+		"ignore-container-memory-limit",
+		false,
+		"Disables the requirement of setting a container memory limit",
+	)
+	verboseOutput := fs.CountP(
+		"verbose",
+		"v",
+		"Enable verbose output, can be set multiple times for increased verbosity.",
+	)
 	printHelp := fs.Bool("help", false, "Print help")
-	outputFormat := fs.StringP("output-format", "o", "human", "Set to 'human', 'json', 'ci' or 'sarif'. If set to ci, kube-score will output the program in a format that is easier to parse by other programs. Sarif output allows for easier integration with CI platforms.")
-	outputVersion := fs.String("output-version", "", "Changes the version of the --output-format. The 'json' format has version 'v2' (default) and 'v1' (deprecated, will be removed in v1.7.0). The 'human' and 'ci' formats has only version 'v1' (default). If not explicitly set, the default version for that particular output format will be used.")
-	color := fs.String("color", "auto", "If the output should be colored. Set to 'always', 'never' or 'auto'. If set to 'auto', kube-score will try to detect if the current terminal / platform supports colors. If set to 'never', kube-score will not output any colors. If set to 'always', kube-score will output colors even if the current terminal / platform does not support colors.")
-	optionalTests := fs.StringSlice("enable-optional-test", []string{}, "Enable an optional test, can be set multiple times")
-	ignoreTests := fs.StringSlice("ignore-test", []string{}, "Disable a test, can be set multiple times")
-	disableIgnoreChecksAnnotation := fs.Bool("disable-ignore-checks-annotations", false, "Set to true to disable the effect of the 'kube-score/ignore' annotations")
-	disableOptionalChecksAnnotation := fs.Bool("disable-optional-checks-annotations", false, "Set to true to disable the effect of the 'kube-score/enable' annotations")
-	allDefaultOptional := fs.Bool("all-default-optional", false, "Set to true to enable all tests")
-	kubernetesVersion := fs.String("kubernetes-version", "v1.18", "Setting the kubernetes-version will affect the checks ran against the manifests. Set this to the version of Kubernetes that you're using in production for the best results.")
+	outputFormat := fs.StringP(
+		"output-format",
+		"o",
+		"human",
+		"Set to 'human', 'json', 'ci' or 'sarif'. If set to ci, kube-score will output the program in a format that is easier to parse by other programs. Sarif output allows for easier integration with CI platforms.",
+	)
+	outputVersion := fs.String(
+		"output-version",
+		"",
+		"Changes the version of the --output-format. The 'json' format has version 'v2' (default) and 'v1' (deprecated, will be removed in v1.7.0). The 'human' and 'ci' formats has only version 'v1' (default). If not explicitly set, the default version for that particular output format will be used.",
+	)
+	color := fs.String(
+		"color",
+		"auto",
+		"If the output should be colored. Set to 'always', 'never' or 'auto'. If set to 'auto', kube-score will try to detect if the current terminal / platform supports colors. If set to 'never', kube-score will not output any colors. If set to 'always', kube-score will output colors even if the current terminal / platform does not support colors.",
+	)
+	optionalTests := fs.StringSlice(
+		"enable-optional-test",
+		[]string{},
+		"Enable an optional test, can be set multiple times",
+	)
+	ignoreTests := fs.StringSlice(
+		"ignore-test",
+		[]string{},
+		"Disable a test, can be set multiple times",
+	)
+	disableIgnoreChecksAnnotation := fs.Bool(
+		"disable-ignore-checks-annotations",
+		false,
+		"Set to true to disable the effect of the 'kube-score/ignore' annotations",
+	)
+	disableOptionalChecksAnnotation := fs.Bool(
+		"disable-optional-checks-annotations",
+		false,
+		"Set to true to disable the effect of the 'kube-score/enable' annotations",
+	)
+	allDefaultOptional := fs.Bool(
+		"all-default-optional",
+		false,
+		"Set to true to enable all tests",
+	)
+	kubernetesVersion := fs.String(
+		"kubernetes-version",
+		"v1.18",
+		"Setting the kubernetes-version will affect the checks ran against the manifests. Set this to the version of Kubernetes that you're using in production for the best results.",
+	)
 	setDefault(fs, binName, "score", false)
 
 	err := fs.Parse(args)
@@ -127,9 +192,12 @@ func scoreFiles(binName string, args []string) error {
 		return nil
 	}
 
-	if *outputFormat != "human" && *outputFormat != "ci" && *outputFormat != "json" && *outputFormat != "sarif" {
+	if *outputFormat != "human" && *outputFormat != "ci" && *outputFormat != "json" &&
+		*outputFormat != "sarif" {
 		fs.Usage()
-		return fmt.Errorf("--output-format must be set to: 'human', 'json', 'sarif', or 'ci'")
+		return fmt.Errorf(
+			"--output-format must be set to: 'human', 'json', 'sarif', or 'ci'",
+		)
 	}
 
 	acceptedColors := map[string]bool{
@@ -144,16 +212,59 @@ func scoreFiles(binName string, args []string) error {
 
 	filesToRead := fs.Args()
 	if len(filesToRead) == 0 {
-		return fmt.Errorf(`no files given as arguments.
+		fmt.Fprintf(os.Stderr, `no files given as arguments.
 
 Usage: %s score [--flag1 --flag2] file1 file2 ...
 
 Use "-" as filename to read from STDIN.`, execName(binName))
+		return fmt.Errorf("no files given")
 	}
 
+	return run(Options{
+		filesToRead,
+		exitOneOnWarning,
+		skipInitContainers,
+		namespace,
+		ignoreContainerCpuLimit,
+		ignoreContainerMemoryLimit,
+		verboseOutput,
+		printHelp,
+		outputFormat,
+		outputVersion,
+		color,
+		optionalTests,
+		ignoreTests,
+		disableIgnoreChecksAnnotation,
+		disableOptionalChecksAnnotation,
+		allDefaultOptional,
+		kubernetesVersion,
+	})
+}
+
+type Options struct {
+	filesToRead                     []string
+	exitOneOnWarning                *bool
+	skipInitContainers              *bool
+	namespace                       *string
+	ignoreContainerCpuLimit         *bool
+	ignoreContainerMemoryLimit      *bool
+	verboseOutput                   *int
+	printHelp                       *bool
+	outputFormat                    *string
+	outputVersion                   *string
+	color                           *string
+	optionalTests                   *[]string
+	ignoreTests                     *[]string
+	disableIgnoreChecksAnnotation   *bool
+	disableOptionalChecksAnnotation *bool
+	allDefaultOptional              *bool
+	kubernetesVersion               *string
+}
+
+func run(opts Options) error {
 	var allFilePointers []ks.NamedReader
 
-	for _, file := range filesToRead {
+	for _, file := range opts.filesToRead {
 		var fp io.Reader
 		var filename string
 
@@ -168,36 +279,39 @@ Use "-" as filename to read from STDIN.`, execName(binName))
 			}
 			filename, _ = filepath.Abs(file)
 		}
-		allFilePointers = append(allFilePointers, namedReader{Reader: fp, name: filename})
+		allFilePointers = append(
+			allFilePointers,
+			namedReader{Reader: fp, name: filename},
+		)
 	}
 
-	if len(*ignoreTests) > 0 && *allDefaultOptional {
-		// ROMAN: allow enable all and then ignore based on the order of arguments
-		// return errors.New("Invalid argument combination. --all-default-optional and --ignore-tests cannot be used together")
-	}
+	// ROMAN: allow enable all and then ignore based on the order of arguments
+	// if len(*opts.ignoreTests) > 0 && *opts.allDefaultOptional {
+	// return errors.New("Invalid argument combination. --all-default-optional and --ignore-tests cannot be used together")
+	// }
 
-	ignoredTests := listToStructMap(ignoreTests)
-	enabledOptionalTests := listToStructMap(optionalTests)
+	ignoredTests := listToStructMap(opts.ignoreTests)
+	enabledOptionalTests := listToStructMap(opts.optionalTests)
 
 	checkConfig := checks.Config{IgnoredTests: ignoredTests}
 
-	kubeVer, err := config.ParseSemver(*kubernetesVersion)
+	kubeVer, err := config.ParseSemver(*opts.kubernetesVersion)
 	if err != nil {
 		return errors.New("invalid --kubernetes-version. Use on format \"vN.NN\"")
 	}
 
 	runConfig := &config.RunConfiguration{
-		Namespace:                             *namespace,
-		SkipInitContainers:                    *skipInitContainers,
-		IgnoreContainerCpuLimitRequirement:    *ignoreContainerCpuLimit,
-		IgnoreContainerMemoryLimitRequirement: *ignoreContainerMemoryLimit,
+		Namespace:                             *opts.namespace,
+		SkipInitContainers:                    *opts.skipInitContainers,
+		IgnoreContainerCpuLimitRequirement:    *opts.ignoreContainerCpuLimit,
+		IgnoreContainerMemoryLimitRequirement: *opts.ignoreContainerMemoryLimit,
 		EnabledOptionalTests:                  enabledOptionalTests,
-		UseIgnoreChecksAnnotation:             !*disableIgnoreChecksAnnotation,
-		UseOptionalChecksAnnotation:           !*disableOptionalChecksAnnotation,
+		UseIgnoreChecksAnnotation:             !*opts.disableIgnoreChecksAnnotation,
+		UseOptionalChecksAnnotation:           !*opts.disableOptionalChecksAnnotation,
 		KubernetesVersion:                     kubeVer,
 	}
 
-	if *allDefaultOptional {
+	if *opts.allDefaultOptional {
 		for _, c := range score.RegisterAllChecks(parser.Empty(), &checkConfig, runConfig).All() {
 			if c.Optional {
 				if _, ok := ignoredTests[c.ID]; !ok {
@@ -206,9 +320,8 @@ Use "-" as filename to read from STDIN.`, execName(binName))
 			}
 		}
 	}
-
 	p, err := parser.New(&parser.Config{
-		VerboseOutput: *verboseOutput,
+		VerboseOutput: *opts.verboseOutput,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to initializer parser: %w", err)
@@ -230,7 +343,7 @@ Use "-" as filename to read from STDIN.`, execName(binName))
 	switch {
 	case scoreCard.AnyBelowOrEqualToGrade(scorecard.GradeCritical):
 		exitCode = 1
-	case *exitOneOnWarning && scoreCard.AnyBelowOrEqualToGrade(scorecard.GradeWarning):
+	case *opts.exitOneOnWarning && scoreCard.AnyBelowOrEqualToGrade(scorecard.GradeWarning):
 		exitCode = 1
 	default:
 		exitCode = 0
@@ -238,29 +351,34 @@ Use "-" as filename to read from STDIN.`, execName(binName))
 
 	var r io.Reader
 
-	version := getOutputVersion(*outputVersion, *outputFormat)
+	version := getOutputVersion(*opts.outputVersion, *opts.outputFormat)
 
 	switch {
-	case *outputFormat == "json" && version == "v1":
+	case *opts.outputFormat == "json" && version == "v1":
 		d, _ := json.MarshalIndent(scoreCard, "", "    ")
 		w := bytes.NewBufferString("")
 		w.WriteString(string(d))
 		r = w
-	case *outputFormat == "json" && version == "v2":
+	case *opts.outputFormat == "json" && version == "v2":
 		r = json_v2.Output(scoreCard)
-	case *outputFormat == "human" && version == "v1":
+	case *opts.outputFormat == "human" && version == "v1":
 		termWidth, _, err := term.GetSize(int(os.Stdin.Fd()))
 		// Assume a width of 80 if it can't be detected
 		if err != nil {
 			termWidth = 80
 		}
-		r, err = human.Human(scoreCard, *verboseOutput, termWidth, useColor(*color))
+		r, err = human.Human(
+			scoreCard,
+			*opts.verboseOutput,
+			termWidth,
+			useColor(*opts.color),
+		)
 		if err != nil {
 			return err
 		}
-	case *outputFormat == "ci" && version == "v1":
+	case *opts.outputFormat == "ci" && version == "v1":
 		r = ci.CI(scoreCard)
-	case *outputFormat == "sarif":
+	case *opts.outputFormat == "sarif":
 		r = sarif.Output(scoreCard)
 	default:
 		return fmt.Errorf("error: Unknown --output-format or --output-version")

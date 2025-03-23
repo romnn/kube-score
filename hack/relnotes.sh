@@ -34,7 +34,7 @@ while read -r line; do
 done <<< "$RELNOTE_MERGES"
 
 #
-# Authors secrion
+# Authors section
 #
 echo
 echo -n "This release contains contributions from: "

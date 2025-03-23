@@ -7,15 +7,26 @@ import (
 )
 
 func Register(allChecks *checks.Checks) {
-	allChecks.RegisterCronJobCheck("CronJob has deadline", `Makes sure that all CronJobs has a configured deadline`, cronJobHasDeadline)
-	allChecks.RegisterCronJobCheck("CronJob RestartPolicy", `Makes sure CronJobs have a valid RestartPolicy`, cronJobHasRestartPolicy)
+	allChecks.RegisterCronJobCheck(
+		"CronJob has deadline",
+		`Makes sure that all CronJobs has a configured deadline`,
+		cronJobHasDeadline,
+	)
+	allChecks.RegisterCronJobCheck(
+		"CronJob RestartPolicy",
+		`Makes sure CronJobs have a valid RestartPolicy`,
+		cronJobHasRestartPolicy,
+	)
 }
 
 func cronJobHasDeadline(job ks.CronJob) (score scorecard.TestScore, err error) {
 	if job.StartingDeadlineSeconds() == nil {
 		score.Grade = scorecard.GradeCritical
-		score.AddComment("", "The CronJob should have startingDeadlineSeconds configured",
-			"This makes sure that jobs are automatically cancelled if they can not be scheduled")
+		score.AddComment(
+			"",
+			"The CronJob should have startingDeadlineSeconds configured",
+			"This makes sure that jobs are automatically cancelled if they can not be scheduled",
+		)
 		return
 	}
 
