@@ -1,18 +1,9 @@
 package internal
 
-import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-// MapLabels implements the Kubernetes Labels interface
-type MapLabels map[string]string
-
-func (l MapLabels) Has(key string) bool {
-	_, ok := l[key]
-	return ok
-}
-
-func (l MapLabels) Get(key string) string {
-	return l[key]
-}
+import (
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8slabels "k8s.io/apimachinery/pkg/labels"
+)
 
 func LabelSelectorMatchesLabels(
 	selectorLabels map[string]string,
@@ -27,5 +18,5 @@ func LabelSelectorMatchesLabels(
 		return false
 	}
 
-	return selector.Matches(MapLabels(labels))
+	return selector.Matches(k8slabels.Set(labels))
 }

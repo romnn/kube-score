@@ -5,10 +5,10 @@ import (
 
 	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8slabels "k8s.io/apimachinery/pkg/labels"
 
 	ks "github.com/romnn/kube-score/domain"
 	"github.com/romnn/kube-score/score/checks"
-	"github.com/romnn/kube-score/score/internal"
 	"github.com/romnn/kube-score/scorecard"
 )
 
@@ -57,7 +57,6 @@ func podHasNetworkPolicy(
 			netPol := n.NetworkPolicy()
 
 			netPolNamespace := netPol.Namespace
-
 			if netPolNamespace == "" {
 				netPolNamespace = options.Namespace
 			}
@@ -83,7 +82,7 @@ func podHasNetworkPolicy(
 				fmt.Printf("policy/%s => NAMESPACE match\n", netPol.Name)
 			}
 			if selector, err := metav1.LabelSelectorAsSelector(&netPol.Spec.PodSelector); err == nil {
-				if selector.Matches(internal.MapLabels(pod.Labels)) {
+				if selector.Matches(k8slabels.Set(pod.Labels)) {
 
 					if verbose {
 						fmt.Printf("policy/%s => LABEL match\n", netPol.Name)
@@ -166,8 +165,8 @@ func networkPolicyTargetsPod(
 
 		for _, p := range pods {
 			pod := p.Pod()
-			podNamespace := pod.Namespace
 
+			podNamespace := pod.Namespace
 			if podNamespace == "" {
 				podNamespace = options.Namespace
 			}
@@ -201,7 +200,7 @@ func networkPolicyTargetsPod(
 						selector.String(),
 					)
 				}
-				if selector.Matches(internal.MapLabels(pod.Labels)) {
+				if selector.Matches(k8slabels.Set(pod.Labels)) {
 					if verbose {
 						fmt.Printf("policy/%s => LABEL match\n", netpol.Name)
 					}
@@ -237,7 +236,7 @@ func networkPolicyTargetsPod(
 						)
 					}
 					if selector.Matches(
-						internal.MapLabels(pod.GetPodTemplateSpec().Labels),
+						k8slabels.Set(pod.GetPodTemplateSpec().Labels),
 					) {
 						if verbose {
 							fmt.Printf("policy/%s => LABEL match\n", netpol.Name)

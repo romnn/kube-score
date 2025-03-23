@@ -9,16 +9,20 @@ import (
 	"github.com/romnn/kube-score/scorecard"
 )
 
-func Register(allChecks *checks.Checks, pods ks.Pods, podspeccers ks.PodSpeccers) {
+type Options struct {
+	Namespace string
+}
+
+func Register(allChecks *checks.Checks, pods ks.Pods, podspeccers ks.PodSpeccers, options Options) {
 	allChecks.RegisterServiceCheck(
 		"Service Targets Pod",
 		`Makes sure that all Services targets a Pod`,
-		serviceTargetsPod(pods.Pods(), podspeccers.PodSpeccers()),
+		serviceTargetsPod(pods.Pods(), podspeccers.PodSpeccers(), options),
 	)
 	allChecks.RegisterServiceCheck(
 		"Service Type",
 		`Makes sure that the Service type is not NodePort`,
-		serviceType,
+		serviceType(options),
 	)
 }
 
@@ -27,38 +31,54 @@ func Register(allChecks *checks.Checks, pods ks.Pods, podspeccers ks.PodSpeccers
 func serviceTargetsPod(
 	pods []ks.Pod,
 	podspecers []ks.PodSpecer,
+	options Options,
 ) func(corev1.Service) (scorecard.TestScore, error) {
 	podsInNamespace := make(map[string][]map[string]string)
 	for _, p := range pods {
 		pod := p.Pod()
-		if _, ok := podsInNamespace[pod.Namespace]; !ok {
-			podsInNamespace[pod.Namespace] = []map[string]string{}
+		namespace := pod.Namespace
+		if namespace == "" {
+			namespace = options.Namespace
 		}
-		podsInNamespace[pod.Namespace] = append(
-			podsInNamespace[pod.Namespace],
+		if _, ok := podsInNamespace[namespace]; !ok {
+			podsInNamespace[namespace] = []map[string]string{}
+		}
+		podsInNamespace[namespace] = append(
+			podsInNamespace[namespace],
 			pod.Labels,
 		)
 	}
 	for _, podSpec := range podspecers {
-		if _, ok := podsInNamespace[podSpec.GetObjectMeta().Namespace]; !ok {
-			podsInNamespace[podSpec.GetObjectMeta().Namespace] = []map[string]string{}
+		podNamespace := podSpec.GetObjectMeta().Namespace
+		if podNamespace == "" {
+			podNamespace = options.Namespace
 		}
-		podsInNamespace[podSpec.GetObjectMeta().Namespace] = append(
-			podsInNamespace[podSpec.GetObjectMeta().Namespace],
+
+		if _, ok := podsInNamespace[podNamespace]; !ok {
+			podsInNamespace[podNamespace] = []map[string]string{}
+		}
+		podsInNamespace[podNamespace] = append(
+			podsInNamespace[podNamespace],
 			podSpec.GetPodTemplateSpec().Labels,
 		)
 	}
 
-	return func(service corev1.Service) (score scorecard.TestScore, err error) {
+	return func(service corev1.Service) (scorecard.TestScore, error) {
 		// Services of type ExternalName does not have a selector
+		var score scorecard.TestScore
 		if service.Spec.Type == corev1.ServiceTypeExternalName {
 			score.Grade = scorecard.GradeAllOK
-			return
+			return score, nil
 		}
 
 		hasMatch := false
 
-		for _, podLabels := range podsInNamespace[service.Namespace] {
+		serviceNamespace := service.Namespace
+		if serviceNamespace == "" {
+			serviceNamespace = options.Namespace
+		}
+
+		for _, podLabels := range podsInNamespace[serviceNamespace] {
 			if internal.LabelSelectorMatchesLabels(service.Spec.Selector, podLabels) {
 				hasMatch = true
 				break
@@ -72,21 +92,24 @@ func serviceTargetsPod(
 			score.AddComment("", "The services selector does not match any pods", "")
 		}
 
-		return
+		return score, nil
 	}
 }
 
-func serviceType(service corev1.Service) (score scorecard.TestScore, err error) {
-	if service.Spec.Type == corev1.ServiceTypeNodePort {
-		score.Grade = scorecard.GradeWarning
-		score.AddComment(
-			"",
-			"The service is of type NodePort",
-			"NodePort services should be avoided as they are insecure, and can not be used together with NetworkPolicies. LoadBalancers or use of an Ingress is recommended over NodePorts.",
-		)
-		return
-	}
+func serviceType(options Options) func(service corev1.Service) (scorecard.TestScore, error) {
+	return func(service corev1.Service) (scorecard.TestScore, error) {
+		var score scorecard.TestScore
+		if service.Spec.Type == corev1.ServiceTypeNodePort {
+			score.Grade = scorecard.GradeWarning
+			score.AddComment(
+				"",
+				"The service is of type NodePort",
+				"NodePort services should be avoided as they are insecure, and can not be used together with NetworkPolicies. LoadBalancers or use of an Ingress is recommended over NodePorts.",
+			)
+			return score, nil
+		}
 
-	score.Grade = scorecard.GradeAllOK
-	return
+		score.Grade = scorecard.GradeAllOK
+		return score, nil
+	}
 }

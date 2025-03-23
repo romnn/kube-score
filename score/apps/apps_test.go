@@ -183,7 +183,8 @@ func TestStatefulsetHasAntiAffinity(t *testing.T) {
 			},
 		}
 
-		score, err := statefulsetHasAntiAffinity(s)
+		f := statefulsetHasAntiAffinity(Options{})
+		score, err := f(s)
 		assert.Nil(t, err)
 		assert.Equal(t, tc.expectedGrade, score.Grade, "caseID=%d", caseID)
 	}
@@ -208,7 +209,8 @@ func TestDeploymentHasAntiAffinity(t *testing.T) {
 			},
 		}
 
-		score, err := deploymentHasAntiAffinity(s)
+		f := deploymentHasAntiAffinity(Options{})
+		score, err := f(s)
 		assert.Nil(t, err)
 		assert.Equal(
 			t,
@@ -252,7 +254,7 @@ func TestDeploymentTargetedByHpaHasNoReplicasAllOK(t *testing.T) {
 		},
 	}
 
-	f := hpaDeploymentNoReplicas(hpas)
+	f := hpaDeploymentNoReplicas(hpas, Options{})
 	score, err := f(deployment)
 	assert.Nil(t, err)
 	assert.Equal(t, scorecard.GradeAllOK, score.Grade)
@@ -284,7 +286,7 @@ func TestDeploymentTargetedByHpaHasSetReplicasCritical(t *testing.T) {
 		},
 	}
 
-	f := hpaDeploymentNoReplicas(hpas)
+	f := hpaDeploymentNoReplicas(hpas, Options{})
 	score, err := f(deployment)
 	assert.Nil(t, err)
 	assert.Equal(t, scorecard.GradeCritical, score.Grade)
@@ -316,7 +318,7 @@ func TestDeploymentNotTargetedByHpaIsSkippedAllOKK(t *testing.T) {
 		},
 	}
 
-	f := hpaDeploymentNoReplicas(hpas)
+	f := hpaDeploymentNoReplicas(hpas, Options{})
 	score, err := f(deployment)
 	assert.Nil(t, err)
 	assert.Equal(t, scorecard.GradeAllOK, score.Grade)
@@ -348,7 +350,7 @@ func TestDeploymentTargetedByHpaHasNoReplicasAllOKCaseInsensitiveKind(t *testing
 		},
 	}
 
-	f := hpaDeploymentNoReplicas(hpas)
+	f := hpaDeploymentNoReplicas(hpas, Options{})
 	score, err := f(deployment)
 	assert.Nil(t, err)
 	assert.Equal(t, scorecard.GradeAllOK, score.Grade)
@@ -736,8 +738,8 @@ func TestStatefulSetHasServiceName(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		fn := statefulsetHasServiceName(tc.services)
-		score, err := fn(tc.statefulset)
+		f := statefulsetHasServiceName(tc.services, Options{})
+		score, err := f(tc.statefulset)
 		assert.Equal(t, tc.expectedErr, err)
 		assert.Equal(t, tc.expectedGrade, score.Grade)
 		assert.Equal(t, tc.expectedSkipped, score.Skipped)
@@ -858,7 +860,8 @@ func TestStatefulSetSelectorLabels(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		score, err := statefulSetSelectorLabelsMatching(tc.statefulset)
+		f := statefulSetSelectorLabelsMatching(Options{})
+		score, err := f(tc.statefulset)
 		assert.Equal(t, tc.expectedErr, err)
 		assert.Equal(t, tc.expectedGrade, score.Grade)
 	}
@@ -978,7 +981,8 @@ func TestDeploymentSelectorLabels(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		score, err := deploymentSelectorLabelsMatching(tc.statefulset)
+		f := deploymentSelectorLabelsMatching(Options{})
+		score, err := f(tc.statefulset)
 		assert.Equal(t, tc.expectedErr, err)
 		assert.Equal(t, tc.expectedGrade, score.Grade)
 	}

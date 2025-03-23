@@ -32,8 +32,8 @@ func RegisterAllChecks(
 ) *checks.Checks {
 	allChecks := checks.New(checksConfig)
 
-	deployment.Register(allChecks, allObjects)
-	ingress.Register(allChecks, allObjects)
+	deployment.Register(allChecks, allObjects, deployment.Options{Namespace: runConfig.Namespace})
+	ingress.Register(allChecks, allObjects, ingress.Options{Namespace: runConfig.Namespace})
 	cronjob.Register(allChecks)
 	container.Register(allChecks, container.Options{
 		SkipInitContainers:                    runConfig.SkipInitContainers,
@@ -54,20 +54,25 @@ func RegisterAllChecks(
 	)
 	probes.Register(allChecks, allObjects, probes.Options{
 		SkipInitContainers: runConfig.SkipInitContainers,
+		Namespace:          runConfig.Namespace,
 	})
 	security.Register(allChecks, security.Options{
 		SkipInitContainers: runConfig.SkipInitContainers,
 	})
-	service.Register(allChecks, allObjects, allObjects)
+	service.Register(allChecks, allObjects, allObjects, service.Options{Namespace: runConfig.Namespace})
 	stable.Register(runConfig.KubernetesVersion, allChecks)
 	apps.Register(
 		allChecks,
 		allObjects.HorizontalPodAutoscalers(),
 		allObjects.Services(),
+		apps.Options{
+			Namespace: runConfig.Namespace,
+		},
 	)
 	meta.Register(allChecks)
 	hpa.Register(allChecks, hpa.Options{
 		AllTargetableObjs: allObjects.Metas(),
+		Namespace:         runConfig.Namespace,
 	})
 	podtopologyspreadconstraints.Register(allChecks)
 

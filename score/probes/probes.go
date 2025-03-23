@@ -10,6 +10,7 @@ import (
 
 type Options struct {
 	SkipInitContainers bool
+	Namespace          string
 }
 
 func Register(allChecks *checks.Checks, services ks.Services, options Options) {
@@ -50,7 +51,7 @@ func containerProbes(
 		isTargetedByService := false
 
 		for _, s := range allServices {
-			if podIsTargetedByService(podTemplate, s.Service()) {
+			if podIsTargetedByService(podTemplate, s.Service(), options) {
 				isTargetedByService = true
 				break
 			}
@@ -155,8 +156,17 @@ func containerProbes(
 	}
 }
 
-func podIsTargetedByService(pod corev1.PodTemplateSpec, service corev1.Service) bool {
-	if pod.Namespace != service.Namespace {
+func podIsTargetedByService(pod corev1.PodTemplateSpec, service corev1.Service, options Options) bool {
+	podNamespace := pod.Namespace
+	if podNamespace == "" {
+		podNamespace = options.Namespace
+	}
+	serviceNamespace := service.Namespace
+	if serviceNamespace == "" {
+		serviceNamespace = options.Namespace
+	}
+
+	if podNamespace != serviceNamespace {
 		return false
 	}
 
