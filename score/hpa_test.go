@@ -3,7 +3,7 @@ package score
 import (
 	"testing"
 
-	"github.com/zegl/kube-score/scorecard"
+	"github.com/romnn/kube-score/scorecard"
 )
 
 func TestHorizontalPodAutoscalerV1TargetsDeployment(t *testing.T) {

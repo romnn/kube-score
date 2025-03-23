@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	ks "github.com/zegl/kube-score/domain"
+	ks "github.com/romnn/kube-score/domain"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -1,7 +1,7 @@
 package cronjob
 
 import (
-	ks "github.com/zegl/kube-score/domain"
+	ks "github.com/romnn/kube-score/domain"
 	"k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

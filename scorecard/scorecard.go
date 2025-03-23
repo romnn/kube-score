@@ -3,9 +3,9 @@ package scorecard
 import (
 	"fmt"
 
-	"github.com/zegl/kube-score/config"
-	ks "github.com/zegl/kube-score/domain"
-	"github.com/zegl/kube-score/parser"
+	"github.com/romnn/kube-score/config"
+	ks "github.com/romnn/kube-score/domain"
+	"github.com/romnn/kube-score/parser"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

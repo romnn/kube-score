@@ -16,7 +16,7 @@ and enable one or more of the following optional checks:
 
 ## Removal timeline of `container-security-context`
 
-`container-security-context` has been deprecated (see [#204](https://github.com/zegl/kube-score/pull/204), [#325](https://github.com/zegl/kube-score/pull/325), [#326](https://github.com/zegl/kube-score/pull/326)).
+`container-security-context` has been deprecated (see [#204](https://github.com/romnn/kube-score/pull/204), [#325](https://github.com/romnn/kube-score/pull/325), [#326](https://github.com/romnn/kube-score/pull/326)).
 
 The checks that has container-security-context preformed has been split into three different checks, which where all introduced in v1.10.
 

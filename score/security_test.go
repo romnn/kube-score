@@ -3,10 +3,10 @@ package score
 import (
 	"testing"
 
+	"github.com/romnn/kube-score/config"
+	ks "github.com/romnn/kube-score/domain"
+	"github.com/romnn/kube-score/scorecard"
 	"github.com/stretchr/testify/assert"
-	"github.com/zegl/kube-score/config"
-	ks "github.com/zegl/kube-score/domain"
-	"github.com/zegl/kube-score/scorecard"
 )
 
 func TestContainerSeccompMissing(t *testing.T) {

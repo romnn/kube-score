@@ -4,9 +4,9 @@ import (
 	"io"
 	"testing"
 
+	"github.com/romnn/kube-score/domain"
+	"github.com/romnn/kube-score/scorecard"
 	"github.com/stretchr/testify/assert"
-	"github.com/zegl/kube-score/domain"
-	"github.com/zegl/kube-score/scorecard"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	ks "github.com/zegl/kube-score/domain"
+	ks "github.com/romnn/kube-score/domain"
 )
 
 func (so *ScoredObject) isEnabled(

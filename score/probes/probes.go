@@ -1,10 +1,10 @@
 package probes
 
 import (
-	ks "github.com/zegl/kube-score/domain"
-	"github.com/zegl/kube-score/score/checks"
-	"github.com/zegl/kube-score/score/internal"
-	"github.com/zegl/kube-score/scorecard"
+	ks "github.com/romnn/kube-score/domain"
+	"github.com/romnn/kube-score/score/checks"
+	"github.com/romnn/kube-score/score/internal"
+	"github.com/romnn/kube-score/scorecard"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -108,7 +108,7 @@ func containerProbes(
 				"",
 				"Container has the same readiness and liveness probe",
 				"Using the same probe for liveness and readiness is very likely dangerous. Generally it's better to avoid the livenessProbe than re-using the readinessProbe.",
-				"https://github.com/zegl/kube-score/blob/master/README_PROBES.md",
+				"https://github.com/romnn/kube-score/blob/master/README_PROBES.md",
 			)
 			return score, nil
 		}
@@ -132,7 +132,7 @@ func containerProbes(
 				"A readinessProbe should be used to indicate when the service is ready to receive traffic. "+
 					"Without it, the Pod is risking to receive traffic before it has booted. "+
 					"It's also used during rollouts, and can prevent downtime if a new version of the application is failing.",
-				"https://github.com/zegl/kube-score/blob/master/README_PROBES.md",
+				"https://github.com/romnn/kube-score/blob/master/README_PROBES.md",
 			)
 			return score, nil
 		}
@@ -144,7 +144,7 @@ func containerProbes(
 				"Container is missing a livenessProbe",
 				"A livenessProbe can be used to restart the container if it's deadlocked or has crashed without exiting. "+
 					"It's only recommended to setup a livenessProbe if you really need one.",
-				"https://github.com/zegl/kube-score/blob/master/README_PROBES.md",
+				"https://github.com/romnn/kube-score/blob/master/README_PROBES.md",
 			)
 			return score, nil
 		}

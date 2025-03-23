@@ -3,9 +3,9 @@ package meta
 import (
 	"regexp"
 
-	"github.com/zegl/kube-score/domain"
-	"github.com/zegl/kube-score/score/checks"
-	"github.com/zegl/kube-score/scorecard"
+	"github.com/romnn/kube-score/domain"
+	"github.com/romnn/kube-score/score/checks"
+	"github.com/romnn/kube-score/scorecard"
 )
 
 func Register(allChecks *checks.Checks) {

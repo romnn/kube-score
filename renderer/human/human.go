@@ -12,7 +12,7 @@ import (
 	"github.com/eidolon/wordwrap"
 	"github.com/fatih/color"
 
-	"github.com/zegl/kube-score/scorecard"
+	"github.com/romnn/kube-score/scorecard"
 )
 
 func Human(

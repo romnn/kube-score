@@ -7,8 +7,8 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	ks "github.com/zegl/kube-score/domain"
-	"github.com/zegl/kube-score/scorecard"
+	ks "github.com/romnn/kube-score/domain"
+	"github.com/romnn/kube-score/scorecard"
 )
 
 type Check struct {

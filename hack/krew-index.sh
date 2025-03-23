@@ -27,10 +27,10 @@ gg checkout -b "kube-score-${VERSION}"
 
 yq --inplace ".spec.version = \"v${VERSION}\""  "${FILE}"
 
-yq --inplace ".spec.platforms[0].uri = \"https://github.com/zegl/kube-score/releases/download/v${VERSION}/kube-score_${VERSION}_darwin_amd64.tar.gz\"" "$FILE"
+yq --inplace ".spec.platforms[0].uri = \"https://github.com/romnn/kube-score/releases/download/v${VERSION}/kube-score_${VERSION}_darwin_amd64.tar.gz\"" "$FILE"
 yq --inplace ".spec.platforms[0].sha256 = \"$(checksum darwin)\"" "$FILE"
 
-yq --inplace ".spec.platforms[1].uri = \"https://github.com/zegl/kube-score/releases/download/v${VERSION}/kube-score_${VERSION}_linux_amd64.tar.gz\"" "$FILE"
+yq --inplace ".spec.platforms[1].uri = \"https://github.com/romnn/kube-score/releases/download/v${VERSION}/kube-score_${VERSION}_linux_amd64.tar.gz\"" "$FILE"
 yq --inplace ".spec.platforms[1].sha256 = \"$(checksum linux)\"" "$FILE"
 
 gg add plugins/score.yaml

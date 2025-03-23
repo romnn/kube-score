@@ -28,13 +28,13 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 
-	ks "github.com/zegl/kube-score/domain"
-	"github.com/zegl/kube-score/parser/internal"
-	internalcronjob "github.com/zegl/kube-score/parser/internal/cronjob"
-	internalnetpol "github.com/zegl/kube-score/parser/internal/networkpolicy"
-	internalpdb "github.com/zegl/kube-score/parser/internal/pdb"
-	internalpod "github.com/zegl/kube-score/parser/internal/pod"
-	internalservice "github.com/zegl/kube-score/parser/internal/service"
+	ks "github.com/romnn/kube-score/domain"
+	"github.com/romnn/kube-score/parser/internal"
+	internalcronjob "github.com/romnn/kube-score/parser/internal/cronjob"
+	internalnetpol "github.com/romnn/kube-score/parser/internal/networkpolicy"
+	internalpdb "github.com/romnn/kube-score/parser/internal/pdb"
+	internalpod "github.com/romnn/kube-score/parser/internal/pod"
+	internalservice "github.com/romnn/kube-score/parser/internal/service"
 )
 
 type Parser struct {

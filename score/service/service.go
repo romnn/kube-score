@@ -3,10 +3,10 @@ package service
 import (
 	corev1 "k8s.io/api/core/v1"
 
-	ks "github.com/zegl/kube-score/domain"
-	"github.com/zegl/kube-score/score/checks"
-	"github.com/zegl/kube-score/score/internal"
-	"github.com/zegl/kube-score/scorecard"
+	ks "github.com/romnn/kube-score/domain"
+	"github.com/romnn/kube-score/score/checks"
+	"github.com/romnn/kube-score/score/internal"
+	"github.com/romnn/kube-score/scorecard"
 )
 
 func Register(allChecks *checks.Checks, pods ks.Pods, podspeccers ks.PodSpeccers) {

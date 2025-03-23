@@ -3,7 +3,7 @@ package pod
 import (
 	networkingv1 "k8s.io/api/networking/v1"
 
-	ks "github.com/zegl/kube-score/domain"
+	ks "github.com/romnn/kube-score/domain"
 )
 
 type NetworkPolicy struct {
