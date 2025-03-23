@@ -3,8 +3,8 @@ package examples
 import (
 	"testing"
 
+	"github.com/romnn/kube-score/scorecard"
 	"github.com/stretchr/testify/assert"
-	"github.com/zegl/kube-score/scorecard"
 )
 
 func TestExampleCheckObjectAllOK(t *testing.T) {

@@ -5,12 +5,12 @@ import (
 	"io"
 	"strings"
 
-	"github.com/zegl/kube-score/config"
-	"github.com/zegl/kube-score/domain"
-	"github.com/zegl/kube-score/parser"
-	"github.com/zegl/kube-score/score"
-	"github.com/zegl/kube-score/score/checks"
-	"github.com/zegl/kube-score/scorecard"
+	"github.com/romnn/kube-score/config"
+	"github.com/romnn/kube-score/domain"
+	"github.com/romnn/kube-score/parser"
+	"github.com/romnn/kube-score/score"
+	"github.com/romnn/kube-score/score/checks"
+	"github.com/romnn/kube-score/scorecard"
 
 	v1 "k8s.io/api/apps/v1"
 )

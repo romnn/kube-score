@@ -9,8 +9,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	ks "github.com/zegl/kube-score/domain"
-	"github.com/zegl/kube-score/scorecard"
+	ks "github.com/romnn/kube-score/domain"
+	"github.com/romnn/kube-score/scorecard"
 )
 
 type testcase struct {

@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/zegl/kube-score/domain"
-	"github.com/zegl/kube-score/scorecard"
+	"github.com/romnn/kube-score/domain"
+	"github.com/romnn/kube-score/scorecard"
 )
 
 func getTestCard() *scorecard.Scorecard {

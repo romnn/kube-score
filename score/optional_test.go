@@ -3,10 +3,10 @@ package score
 import (
 	"testing"
 
-	"github.com/zegl/kube-score/config"
-	ks "github.com/zegl/kube-score/domain"
-	"github.com/zegl/kube-score/score/checks"
-	"github.com/zegl/kube-score/scorecard"
+	"github.com/romnn/kube-score/config"
+	ks "github.com/romnn/kube-score/domain"
+	"github.com/romnn/kube-score/score/checks"
+	"github.com/romnn/kube-score/scorecard"
 )
 
 func TestOptionalSkippedByDefault(t *testing.T) {

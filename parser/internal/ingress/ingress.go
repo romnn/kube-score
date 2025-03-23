@@ -3,7 +3,7 @@ package ingress
 import (
 	"k8s.io/api/extensions/v1beta1"
 
-	ks "github.com/zegl/kube-score/domain"
+	ks "github.com/romnn/kube-score/domain"
 )
 
 type Ingress struct {

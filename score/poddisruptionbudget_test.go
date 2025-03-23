@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/romnn/kube-score/scorecard"
 	"github.com/stretchr/testify/assert"
-	"github.com/zegl/kube-score/scorecard"
 )
 
 func TestStatefulSetPodDisruptionBudgetMatches(t *testing.T) {

@@ -5,12 +5,12 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/romnn/kube-score/config"
+	ks "github.com/romnn/kube-score/domain"
+	"github.com/romnn/kube-score/parser"
+	"github.com/romnn/kube-score/score/checks"
+	"github.com/romnn/kube-score/scorecard"
 	"github.com/stretchr/testify/assert"
-	"github.com/zegl/kube-score/config"
-	ks "github.com/zegl/kube-score/domain"
-	"github.com/zegl/kube-score/parser"
-	"github.com/zegl/kube-score/score/checks"
-	"github.com/zegl/kube-score/scorecard"
 )
 
 func testFile(name string) *os.File {

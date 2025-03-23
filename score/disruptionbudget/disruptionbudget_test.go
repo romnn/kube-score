@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
 
-	"github.com/zegl/kube-score/scorecard"
+	"github.com/romnn/kube-score/scorecard"
 )
 
 func TestStatefulSetReplicas(t *testing.T) {

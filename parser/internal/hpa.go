@@ -5,7 +5,7 @@ import (
 	autoscalingv2 "k8s.io/api/autoscaling/v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	ks "github.com/zegl/kube-score/domain"
+	ks "github.com/romnn/kube-score/domain"
 )
 
 type HPAv1 struct {

@@ -6,7 +6,7 @@
 
 ### Reporting bugs
 
-Bug reports are always welcome, and should be reported as a [GitHub issue](https://github.com/zegl/kube-score/issues/new/choose).
+Bug reports are always welcome, and should be reported as a [GitHub issue](https://github.com/romnn/kube-score/issues/new/choose).
 
 It's easy to open an issue, all you need to do is to answer the following questions:
 
@@ -17,7 +17,7 @@ It's easy to open an issue, all you need to do is to answer the following questi
 
 ### Feature requests
 
-Feature requests are always welcome, this should also be done as a [GitHub issue](https://github.com/zegl/kube-score/issues/new/choose).
+Feature requests are always welcome, this should also be done as a [GitHub issue](https://github.com/romnn/kube-score/issues/new/choose).
 
 There is currently no set template for feature requests, but largely the same template as the issues can be used.
 

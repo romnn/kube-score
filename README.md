@@ -2,12 +2,12 @@
 
 <p align="center"><img src="https://user-images.githubusercontent.com/47952/56085330-6c0a2480-5e41-11e9-89ba-0cfddd7714a8.png" height="200"></p>
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/zegl/kube-score?)](https://goreportcard.com/report/github.com/zegl/kube-score)
-[![Test Go](https://github.com/zegl/kube-score/actions/workflows/test.yaml/badge.svg)](https://github.com/zegl/kube-score/actions/workflows/test.yaml)
-[![Releases](https://img.shields.io/github/release-pre/zegl/kube-score.svg)](https://github.com/zegl/kube-score/releases)
+[![Go Report Card](https://goreportcard.com/badge/github.com/romnn/kube-score?)](https://goreportcard.com/report/github.com/romnn/kube-score)
+[![Test Go](https://github.com/romnn/kube-score/actions/workflows/test.yaml/badge.svg)](https://github.com/romnn/kube-score/actions/workflows/test.yaml)
+[![Releases](https://img.shields.io/github/release-pre/zegl/kube-score.svg)](https://github.com/romnn/kube-score/releases)
 ![GitHub stars](https://img.shields.io/github/stars/zegl/kube-score.svg?label=github%20stars)
 ![Downloads](https://img.shields.io/github/downloads/zegl/kube-score/total.svg)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/zegl/kube-score/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/romnn/kube-score/blob/master/LICENSE)
 
 ---
 
@@ -23,7 +23,7 @@ kube-score is easy to install, and is available from the following sources:
 
 | Distribution                                        | Command / Link                                                                          |
 |-----------------------------------------------------|-----------------------------------------------------------------------------------------|
-| Pre-built binaries for macOS, Linux, and Windows    | [GitHub releases](https://github.com/zegl/kube-score/releases)                          |
+| Pre-built binaries for macOS, Linux, and Windows    | [GitHub releases](https://github.com/romnn/kube-score/releases)                          |
 | Docker                                              | `docker pull zegl/kube-score` ([Docker Hub)](https://hub.docker.com/r/zegl/kube-score/) |
 | Homebrew  (macOS and Linux)                         | `brew install kube-score`                                                |
 | [Krew](https://krew.sigs.k8s.io/) (macOS and Linux) | `kubectl krew install score`                                                            |
@@ -212,6 +212,6 @@ Do you want to help out? Take a look at the [Contributing Guidelines](./.github/
 
 ## Made by
 
-<a href="https://github.com/zegl/kube-score/graphs/contributors">
+<a href="https://github.com/romnn/kube-score/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=zegl/kube-score" />
 </a>

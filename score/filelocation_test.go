@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zegl/kube-score/config"
-	ks "github.com/zegl/kube-score/domain"
+	"github.com/romnn/kube-score/config"
+	ks "github.com/romnn/kube-score/domain"
 )
 
 func TestFileLocationHelm(t *testing.T) {

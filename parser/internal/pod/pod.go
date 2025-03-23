@@ -3,7 +3,7 @@ package pod
 import (
 	corev1 "k8s.io/api/core/v1"
 
-	ks "github.com/zegl/kube-score/domain"
+	ks "github.com/romnn/kube-score/domain"
 )
 
 type Pod struct {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zegl/kube-score/scorecard"
+	"github.com/romnn/kube-score/scorecard"
 )
 
 func TestProbesPodAllMissing(t *testing.T) {

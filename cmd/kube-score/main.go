@@ -11,17 +11,17 @@ import (
 	"path/filepath"
 
 	"github.com/mattn/go-isatty"
+	"github.com/romnn/kube-score/config"
+	ks "github.com/romnn/kube-score/domain"
+	"github.com/romnn/kube-score/parser"
+	"github.com/romnn/kube-score/renderer/ci"
+	"github.com/romnn/kube-score/renderer/human"
+	"github.com/romnn/kube-score/renderer/json_v2"
+	"github.com/romnn/kube-score/renderer/sarif"
+	"github.com/romnn/kube-score/score"
+	"github.com/romnn/kube-score/score/checks"
+	"github.com/romnn/kube-score/scorecard"
 	flag "github.com/spf13/pflag"
-	"github.com/zegl/kube-score/config"
-	ks "github.com/zegl/kube-score/domain"
-	"github.com/zegl/kube-score/parser"
-	"github.com/zegl/kube-score/renderer/ci"
-	"github.com/zegl/kube-score/renderer/human"
-	"github.com/zegl/kube-score/renderer/json_v2"
-	"github.com/zegl/kube-score/renderer/sarif"
-	"github.com/zegl/kube-score/score"
-	"github.com/zegl/kube-score/score/checks"
-	"github.com/zegl/kube-score/scorecard"
 	"golang.org/x/term"
 )
 
@@ -248,6 +248,8 @@ Use "-" as filename to read from STDIN.`, execName(binName))
 		disableOptionalChecksAnnotation,
 		allDefaultOptional,
 		kubernetesVersion,
+		minReplicasDeployment,
+		minReplicasHPA,
 	})
 }
 
@@ -269,6 +271,8 @@ type Options struct {
 	disableOptionalChecksAnnotation *bool
 	allDefaultOptional              *bool
 	kubernetesVersion               *string
+	minReplicasDeployment           *int
+	minReplicasHPA                  *int
 }
 
 func run(opts Options) error {
@@ -319,8 +323,8 @@ func run(opts Options) error {
 		UseIgnoreChecksAnnotation:             !*opts.disableIgnoreChecksAnnotation,
 		UseOptionalChecksAnnotation:           !*opts.disableOptionalChecksAnnotation,
 		KubernetesVersion:                     kubeVer,
-		MinReplicasDeployment:                 *minReplicasDeployment,
-		MinReplicasHPA:                        *minReplicasHPA,
+		MinReplicasDeployment:                 *opts.minReplicasDeployment,
+		MinReplicasHPA:                        *opts.minReplicasHPA,
 	}
 
 	if *opts.allDefaultOptional {
