@@ -100,6 +100,7 @@ func (so *ScoredObject) Add(
 	ts TestScore,
 	check ks.Check,
 	locationer ks.FileLocationer,
+	// annotationProviders ...ks.Annotations,
 	annotations ...map[string]string,
 ) {
 	ts.Check = check
@@ -107,6 +108,11 @@ func (so *ScoredObject) Add(
 
 	skip := false
 	skipAll := so.FileLocation.Skip
+
+	// var annotations []map[string]string
+	// for _, a := range annotationProviders {
+	// 	annotations = append(annotations, a.Annotations())
+	// }
 
 	if !skipAll && annotations != nil {
 		skipAll = skipAll || parser.IsSkipped([]error{}, annotations...)

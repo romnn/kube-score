@@ -236,6 +236,7 @@ func statefulsetHasServiceName(
 	allServices []ks.Service,
 	options Options,
 ) func(statefulset appsv1.StatefulSet) (scorecard.TestScore, error) {
+	verbose := false
 	return func(statefulset appsv1.StatefulSet) (scorecard.TestScore, error) {
 		var score scorecard.TestScore
 		for _, service := range allServices {
@@ -250,13 +251,29 @@ func statefulsetHasServiceName(
 				sfsNamespace = options.Namespace
 			}
 
+			labels := statefulset.Spec.Template.GetObjectMeta().GetLabels()
+
+			if verbose {
+				fmt.Printf("service %q\n", svc.Name)
+				fmt.Printf("\t name: %q == %q\n", svc.Name, statefulset.Spec.ServiceName)
+				fmt.Printf("\t clusterIP: %q\n", svc.Spec.ClusterIP)
+				fmt.Printf("\t selector: %+q\n", svc.Spec.Selector)
+				fmt.Printf("\t labels: %+q\n", labels)
+			}
+
 			if serviceNamespace != sfsNamespace ||
 				svc.Name != statefulset.Spec.ServiceName ||
 				svc.Spec.ClusterIP != "None" {
 				continue
 			}
 
-			labels := statefulset.Spec.Template.GetObjectMeta().GetLabels()
+			if verbose {
+				fmt.Printf("\t match: %t\n", internal.LabelSelectorMatchesLabels(
+					svc.Spec.Selector,
+					labels,
+				))
+			}
+
 			if internal.LabelSelectorMatchesLabels(
 				svc.Spec.Selector,
 				labels,

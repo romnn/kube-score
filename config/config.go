@@ -9,6 +9,7 @@ import (
 
 type RunConfiguration struct {
 	SkipInitContainers                    bool
+	SkipJobs                              bool
 	Namespace                             string
 	IgnoreContainerCpuLimitRequirement    bool
 	IgnoreContainerMemoryLimitRequirement bool

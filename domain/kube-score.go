@@ -35,6 +35,7 @@ type BothMeta struct {
 	TypeMeta   metav1.TypeMeta
 	ObjectMeta metav1.ObjectMeta
 	FileLocationer
+	// Annotations
 }
 
 type PodSpecer interface {
@@ -44,6 +45,10 @@ type PodSpecer interface {
 	GetObjectMeta() metav1.ObjectMeta
 	GetPodTemplateSpec() corev1.PodTemplateSpec
 }
+
+// type Annotations interface {
+// 	Annotations() map[string]string
+// }
 
 type FileLocationer interface {
 	FileLocation() FileLocation
@@ -55,6 +60,7 @@ type HpaTargeter interface {
 	MinReplicas() *int32
 	HpaTarget() autoscalingv1.CrossVersionObjectReference
 	FileLocationer
+	// Annotations
 }
 
 type Ingress interface {
@@ -62,6 +68,7 @@ type Ingress interface {
 	GetObjectMeta() metav1.ObjectMeta
 	Rules() []networkingv1.IngressRule
 	FileLocationer
+	// Annotations
 }
 
 type Metas interface {
@@ -71,6 +78,7 @@ type Metas interface {
 type Pod interface {
 	Pod() corev1.Pod
 	FileLocationer
+	// Annotations
 }
 
 type Pods interface {
@@ -84,6 +92,7 @@ type PodSpeccers interface {
 type Service interface {
 	Service() corev1.Service
 	FileLocationer
+	// Annotations
 }
 
 type Services interface {
@@ -93,6 +102,7 @@ type Services interface {
 type StatefulSet interface {
 	StatefulSet() appsv1.StatefulSet
 	FileLocationer
+	// Annotations
 }
 
 type StatefulSets interface {
@@ -102,6 +112,7 @@ type StatefulSets interface {
 type Deployment interface {
 	Deployment() appsv1.Deployment
 	FileLocationer
+	// Annotations
 }
 
 type Deployments interface {
@@ -111,6 +122,7 @@ type Deployments interface {
 type NetworkPolicy interface {
 	NetworkPolicy() networkingv1.NetworkPolicy
 	FileLocationer
+	// Annotations
 }
 
 type NetworkPolicies interface {
@@ -121,12 +133,25 @@ type Ingresses interface {
 	Ingresses() []Ingress
 }
 
+type Job interface {
+	GetTypeMeta() metav1.TypeMeta
+	GetObjectMeta() metav1.ObjectMeta
+	GetPodTemplateSpec() corev1.PodTemplateSpec
+	FileLocationer
+	// Annotations
+}
+
+type Jobs interface {
+	Jobs() []Job
+}
+
 type CronJob interface {
 	GetTypeMeta() metav1.TypeMeta
 	GetObjectMeta() metav1.ObjectMeta
 	StartingDeadlineSeconds() *int64
 	GetPodTemplateSpec() corev1.PodTemplateSpec
 	FileLocationer
+	// Annotations
 }
 
 type CronJobs interface {
@@ -140,6 +165,7 @@ type PodDisruptionBudget interface {
 	Spec() policyv1.PodDisruptionBudgetSpec
 	PodDisruptionBudgetSelector() *metav1.LabelSelector
 	FileLocationer
+	// Annotations
 }
 
 type PodDisruptionBudgets interface {
@@ -153,6 +179,7 @@ type HorizontalPodAutoscalers interface {
 type AllTypes interface {
 	Metas
 	Pods
+	Jobs
 	PodSpeccers
 	Services
 	StatefulSets
