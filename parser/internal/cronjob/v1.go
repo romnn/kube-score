@@ -30,6 +30,6 @@ func (c CronJobV1) GetObjectMeta() metav1.ObjectMeta {
 
 func (c CronJobV1) GetPodTemplateSpec() corev1.PodTemplateSpec {
 	t := c.Obj.Spec.JobTemplate.Spec.Template
-	t.ObjectMeta.Namespace = c.Obj.ObjectMeta.Namespace
+	t.Namespace = c.Obj.Namespace
 	return t
 }

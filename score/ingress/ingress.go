@@ -37,11 +37,11 @@ func ingressTargetsServiceCommon(
 	allRulesHaveMatches := true
 
 	for _, rule := range ingress.Rules() {
-		if rule.IngressRuleValue.HTTP == nil {
+		if rule.HTTP == nil {
 			continue
 		}
 
-		for _, path := range rule.IngressRuleValue.HTTP.Paths {
+		for _, path := range rule.HTTP.Paths {
 			pathHasMatch := false
 
 			for _, srv := range allServices {

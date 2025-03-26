@@ -71,13 +71,9 @@ tasks:
     desc: "lint"
     aliases: [check]
     cmds:
-      - go vet ./... {{.CLI_ARGS}}
-      - staticcheck ./... {{.CLI_ARGS}}
       - golangci-lint run ./... {{.CLI_ARGS}}
 
   test:
-    desc: "test with race detection"
-    aliases: ["test:race"]
+    desc: "test"
     cmds:
       - richgo test ./... {{.CLI_ARGS}}
-      # - richgo test ./... -race {{.CLI_ARGS}}

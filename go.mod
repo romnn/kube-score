@@ -3,10 +3,12 @@ module github.com/romnn/kube-score
 require (
 	github.com/eidolon/wordwrap v0.0.0-20161011182207-e0f54129b8bb
 	github.com/fatih/color v1.18.0
+	github.com/go-andiamo/splitter v1.2.5
 	github.com/google/go-cmp v0.6.0
 	github.com/mattn/go-isatty v0.0.20
 	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.9.0
+	github.com/vmware-labs/yaml-jsonpath v0.3.2
 	golang.org/x/term v0.30.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.32.3
@@ -16,6 +18,7 @@ require (
 
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/dprotaso/go-yit v0.0.0-20240618133044-5a0af90af097 // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect

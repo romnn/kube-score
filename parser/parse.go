@@ -28,6 +28,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 
+	"github.com/romnn/kube-score/config"
 	ks "github.com/romnn/kube-score/domain"
 	"github.com/romnn/kube-score/parser/internal"
 	internalcronjob "github.com/romnn/kube-score/parser/internal/cronjob"
@@ -44,7 +45,8 @@ type Parser struct {
 }
 
 type Config struct {
-	VerboseOutput int
+	VerboseOutput   int
+	SkipExpressions []*config.SkipExpression
 }
 
 type schemaAdderFunc func(scheme *runtime.Scheme) error
@@ -105,6 +107,7 @@ type parsedObjects struct {
 	statefulsets         []ks.StatefulSet
 	ingresses            []ks.Ingress // supports multiple versions of ingress
 	cronjobs             []ks.CronJob
+	jobs                 []ks.Job
 	hpaTargeters         []ks.HpaTargeter // all versions of HPAs
 }
 
@@ -126,6 +129,10 @@ func (p *parsedObjects) Ingresses() []ks.Ingress {
 
 func (p *parsedObjects) PodDisruptionBudgets() []ks.PodDisruptionBudget {
 	return p.podDisruptionBudgets
+}
+
+func (p *parsedObjects) Jobs() []ks.Job {
+	return p.jobs
 }
 
 func (p *parsedObjects) CronJobs() []ks.CronJob {
@@ -176,8 +183,8 @@ func (p *Parser) ParseFiles(files []ks.NamedReader) (ks.AllTypes, error) {
 			offset = 2
 		}
 
-		for _, fileContents := range bytes.Split(fullFile, []byte("\n---\n")) {
-
+		// for _, fileContents := range bytes.Split(fullFile, []byte("\n---\n")) {
+		for fileContents := range bytes.SplitSeq(fullFile, []byte("\n---\n")) {
 			if len(bytes.TrimSpace(fileContents)) > 0 {
 				if err := p.detectAndDecode(s, namedReader.Name(), offset, fileContents); err != nil {
 					return nil, err
@@ -306,6 +313,20 @@ func (p *Parser) decodeItem(
 
 	fileLocation := detectFileLocation(fileName, fileOffset, fileContents)
 
+	// check if skipped
+	var doc yaml.Node
+	if err := yaml.Unmarshal(fileContents, &doc); err != nil {
+		return err
+	}
+
+	for _, expr := range p.config.SkipExpressions {
+		fileLocation.Skip = expr.Evaluate(doc)
+		if fileLocation.Skip {
+			fmt.Printf("skipping %s\n", detectedVersion.String())
+			return nil
+		}
+	}
+
 	var errs parseErrors
 
 	switch detectedVersion {
@@ -328,7 +349,15 @@ func (p *Parser) decodeItem(
 		var job batchv1.Job
 		errs.AddIfErr(p.decode(fileContents, &job))
 		fileLocation.Skip = p.isSkipped(&job, errs)
-		addPodSpeccer(internal.Batchv1Job{Job: job, Location: fileLocation})
+
+		// set job name for pods from
+		job.Spec.Template.Labels["job-name"] = job.Name
+
+		j := internal.Batchv1Job{Job: job, Location: fileLocation}
+		// job.Labels["job-name"] = ;
+		addPodSpeccer(j)
+		// fmt.Printf("=> parsed job: %q\n", j.GetObjectMeta().Name)
+		s.jobs = append(s.jobs, j)
 
 	case batchv1beta1.SchemeGroupVersion.WithKind("CronJob"):
 		var cronjob batchv1beta1.CronJob

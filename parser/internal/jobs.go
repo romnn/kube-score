@@ -26,6 +26,6 @@ func (d Batchv1Job) GetObjectMeta() metav1.ObjectMeta {
 }
 
 func (d Batchv1Job) GetPodTemplateSpec() corev1.PodTemplateSpec {
-	d.Spec.Template.ObjectMeta.Namespace = d.ObjectMeta.Namespace
+	d.Spec.Template.Namespace = d.Namespace
 	return d.Spec.Template
 }

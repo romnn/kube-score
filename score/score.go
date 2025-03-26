@@ -106,10 +106,10 @@ func (p *podSpeccer) FileLocation() ks.FileLocation {
 func Score(
 	allObjects ks.AllTypes,
 	allChecks *checks.Checks,
-	cnf *config.RunConfiguration,
+	runConfig *config.RunConfiguration,
 ) (*scorecard.Scorecard, error) {
-	if cnf == nil {
-		cnf = &config.RunConfiguration{}
+	if runConfig == nil {
+		runConfig = &config.RunConfiguration{}
 	}
 
 	if allChecks == nil {
@@ -119,7 +119,7 @@ func Score(
 	scoreCard := scorecard.New()
 
 	newObject := func(typeMeta metav1.TypeMeta, objectMeta metav1.ObjectMeta) *scorecard.ScoredObject {
-		return scoreCard.NewObject(typeMeta, objectMeta, cnf)
+		return scoreCard.NewObject(typeMeta, objectMeta, runConfig)
 	}
 
 	for _, ingress := range allObjects.Ingresses() {
@@ -147,7 +147,6 @@ func Score(
 	for _, pod := range allObjects.Pods() {
 		o := newObject(pod.Pod().TypeMeta, pod.Pod().ObjectMeta)
 		for _, test := range allChecks.Pods() {
-
 			podTemplateSpec := corev1.PodTemplateSpec{
 				ObjectMeta: pod.Pod().ObjectMeta,
 				Spec:       pod.Pod().Spec,
@@ -163,6 +162,9 @@ func Score(
 	}
 
 	for _, podspecer := range allObjects.PodSpeccers() {
+		if podspecer.GetTypeMeta().Kind == "Job" && runConfig.SkipJobs {
+			continue
+		}
 		o := newObject(podspecer.GetTypeMeta(), podspecer.GetObjectMeta())
 		for _, test := range allChecks.Pods() {
 			score, _ := test.Fn(podspecer)
@@ -237,6 +239,9 @@ func Score(
 	}
 
 	for _, cjob := range allObjects.CronJobs() {
+		if runConfig.SkipJobs {
+			continue
+		}
 		o := newObject(cjob.GetTypeMeta(), cjob.GetObjectMeta())
 		for _, test := range allChecks.CronJobs() {
 			fn, err := test.Fn(cjob)

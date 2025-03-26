@@ -62,15 +62,22 @@ func podHasNetworkPolicy(
 			}
 
 			if verbose {
-				fmt.Printf(
-					"NAMESPACES:\n\t%80s = %s selector=%v\n\t%80s = %s labels=%v\n",
-					fmt.Sprintf("policy/%s", netPol.Name),
-					netPolNamespace,
-					netPol.Spec.PodSelector,
-					fmt.Sprintf("pod/%s", pod.Name),
-					podNamespace,
-					pod.Labels,
-				)
+				if netPol.Name == "signoz-schema-migrator-allow-k8s-api" {
+					fmt.Printf("netpol=%s\n", netPol.Name)
+					fmt.Printf("\t pod      =%+v\n", pod.Name)
+					fmt.Printf("\t selector =%+v\n", netPol.Spec.PodSelector)
+					fmt.Printf("\t labels   =%+v\n", pod.Labels)
+					fmt.Printf("\t ns       =%q == %q\n", podNamespace, netPolNamespace)
+				}
+				// fmt.Printf(
+				// 	"NAMESPACES:\n\t%80s = %s selector=%v\n\t%80s = %s labels=%v\n",
+				// 	fmt.Sprintf("policy/%s", netPol.Name),
+				// 	netPolNamespace,
+				// 	netPol.Spec.PodSelector,
+				// 	fmt.Sprintf("pod/%s", pod.Name),
+				// 	podNamespace,
+				// 	pod.Labels,
+				// )
 			}
 
 			// Make sure that the pod and networkpolicy is in the same namespace
@@ -78,15 +85,14 @@ func podHasNetworkPolicy(
 				continue
 			}
 
-			if verbose {
-				fmt.Printf("policy/%s => NAMESPACE match\n", netPol.Name)
-			}
+			// if verbose {
+			// 	fmt.Printf("policy/%s => NAMESPACE match\n", netPol.Name)
+			// }
 			if selector, err := metav1.LabelSelectorAsSelector(&netPol.Spec.PodSelector); err == nil {
 				if selector.Matches(k8slabels.Set(pod.Labels)) {
-
-					if verbose {
-						fmt.Printf("policy/%s => LABEL match\n", netPol.Name)
-					}
+					// if verbose {
+					// 	fmt.Printf("policy/%s => LABEL match\n", netPol.Name)
+					// }
 
 					// Documentation of PolicyTypes
 					//
@@ -151,17 +157,27 @@ func podHasNetworkPolicy(
 
 func networkPolicyTargetsPod(
 	pods []ks.Pod,
+	// jobs []ks.Job,
+	// cronJobs []ks.CronJob,
 	podspecers []ks.PodSpecer,
 	options Options,
 ) func(networkingv1.NetworkPolicy) (scorecard.TestScore, error) {
 	verbose := false
-	return func(netpol networkingv1.NetworkPolicy) (score scorecard.TestScore, err error) {
+	return func(netPol networkingv1.NetworkPolicy) (score scorecard.TestScore, err error) {
 		hasMatch := false
 
-		netPolNamespace := netpol.Namespace
+		netPolNamespace := netPol.Namespace
 		if netPolNamespace == "" {
 			netPolNamespace = options.Namespace
 		}
+
+		// for _, j := range jobs {
+		// 	// fmt.Printf("=== job ===")
+		// 	// fmt.Printf("=== job: %s\n", j.GetObjectMeta().Name)
+		// 	// fmt.Printf("type:   %+v\n", j.GetTypeMeta())
+		// 	// fmt.Printf("object: %+v\n", j.GetObjectMeta())
+		// 	// fmt.Printf("pod:    %+v\n", j.GetPodTemplateSpec())
+		// }
 
 		for _, p := range pods {
 			pod := p.Pod()
@@ -172,38 +188,45 @@ func networkPolicyTargetsPod(
 			}
 
 			if verbose {
-				fmt.Printf(
-					"NAMESPACES:\n\t%80s = %s selector=%v\n\t%80s = %s labels=%v\n",
-					fmt.Sprintf("policy/%s", netpol.Name),
-					netPolNamespace,
-					netpol.Spec.PodSelector,
-					fmt.Sprintf("pod/%s", pod.Name),
-					podNamespace,
-					pod.Labels,
-				)
+				// fmt.Printf(
+				// 	"NAMESPACES:\n\t%80s = %s selector=%v\n\t%80s = %s labels=%v\n",
+				// 	fmt.Sprintf("policy/%s", netpol.Name),
+				// 	netPolNamespace,
+				// 	netpol.Spec.PodSelector,
+				// 	fmt.Sprintf("pod/%s", pod.Name),
+				// 	podNamespace,
+				// 	pod.Labels,
+				// )
+				if netPol.Name == "signoz-schema-migrator-allow-k8s-api" {
+					fmt.Printf("netpol=%s\n", netPol.Name)
+					fmt.Printf("\t pod      =%+v\n", pod.Name)
+					fmt.Printf("\t selector =%+v\n", netPol.Spec.PodSelector)
+					fmt.Printf("\t labels   =%+v\n", pod.Labels)
+					fmt.Printf("\t ns       =%q == %q\n", podNamespace, netPolNamespace)
+				}
 			}
 			if podNamespace != netPolNamespace {
 				continue
 			}
 
-			if verbose {
-				fmt.Printf("policy/%s => NAMESPACE match\n", netpol.Name)
-			}
+			// if verbose {
+			// 	fmt.Printf("policy/%s => NAMESPACE match\n", netPol.Name)
+			// }
 
-			if selector, err := metav1.LabelSelectorAsSelector(&netpol.Spec.PodSelector); err == nil {
-				if verbose {
-					fmt.Printf(
-						"policy/%s => checking %s (%s) against selector=%s\n",
-						netpol.Name,
-						pod.Name,
-						pod.Labels,
-						selector.String(),
-					)
-				}
+			if selector, err := metav1.LabelSelectorAsSelector(&netPol.Spec.PodSelector); err == nil {
+				// if verbose {
+				// 	fmt.Printf(
+				// 		"policy/%s => checking %s (%s) against selector=%s\n",
+				// 		netpol.Name,
+				// 		pod.Name,
+				// 		pod.Labels,
+				// 		selector.String(),
+				// 	)
+				// }
 				if selector.Matches(k8slabels.Set(pod.Labels)) {
-					if verbose {
-						fmt.Printf("policy/%s => LABEL match\n", netpol.Name)
-					}
+					// if verbose {
+					// 	fmt.Printf("policy/%s => LABEL match\n", netPol.Name)
+					// }
 					hasMatch = true
 					break
 				}
@@ -222,25 +245,35 @@ func networkPolicyTargetsPod(
 				}
 
 				if verbose {
-					fmt.Printf("policy/%s => NAMESPACE match\n", netpol.Name)
+					if netPol.Name == "signoz-schema-migrator-allow-k8s-api" {
+						fmt.Printf("netpol=%s\n", netPol.Name)
+						fmt.Printf("\t pod      =%+v\n", pod.GetObjectMeta().Name)
+						fmt.Printf("\t selector =%+v\n", netPol.Spec.PodSelector)
+						fmt.Printf("\t labels   =%+v\n", pod.GetPodTemplateSpec().Labels)
+						fmt.Printf("\t ns       =%q == %q\n", podNamespace, netPolNamespace)
+					}
 				}
 
-				if selector, err := metav1.LabelSelectorAsSelector(&netpol.Spec.PodSelector); err == nil {
-					if verbose {
-						fmt.Printf(
-							"policy/%s => checking %s (%s) against selector=%s\n",
-							netpol.Name,
-							pod.GetPodTemplateSpec().Name,
-							pod.GetPodTemplateSpec().Labels,
-							selector.String(),
-						)
-					}
+				// if verbose {
+				// 	fmt.Printf("policy/%s => NAMESPACE match\n", netPol.Name)
+				// }
+
+				if selector, err := metav1.LabelSelectorAsSelector(&netPol.Spec.PodSelector); err == nil {
+					// if verbose {
+					// 	fmt.Printf(
+					// 		"policy/%s => checking %s (%s) against selector=%s\n",
+					// 		netPol.Name,
+					// 		pod.GetPodTemplateSpec().Name,
+					// 		pod.GetPodTemplateSpec().Labels,
+					// 		selector.String(),
+					// 	)
+					// }
 					if selector.Matches(
 						k8slabels.Set(pod.GetPodTemplateSpec().Labels),
 					) {
-						if verbose {
-							fmt.Printf("policy/%s => LABEL match\n", netpol.Name)
-						}
+						// if verbose {
+						// 	fmt.Printf("policy/%s => LABEL match\n", netPol.Name)
+						// }
 						hasMatch = true
 						break
 					}

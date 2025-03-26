@@ -25,7 +25,7 @@ func (so *ScoredObject) isEnabled(
 		}
 
 		// search comma separated list of checks
-		for _, v := range strings.Split(csv, ",") {
+		for v := range strings.SplitSeq(csv, ",") {
 			v = strings.TrimSpace(v)
 			if v == key {
 				return true

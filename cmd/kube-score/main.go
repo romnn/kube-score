@@ -112,6 +112,11 @@ func scoreFiles(binName string, args []string) error {
 		false,
 		"Ignores checks for init containers",
 	)
+	skipJobs := fs.Bool(
+		"ignore-jobs",
+		false,
+		"Ignores checks for jobs",
+	)
 	namespace := fs.StringP(
 		"namespace",
 		"n",
@@ -159,6 +164,11 @@ func scoreFiles(binName string, args []string) error {
 		"ignore-test",
 		[]string{},
 		"Disable a test, can be set multiple times",
+	)
+	skipExpressions := fs.StringArray(
+		"skip",
+		[]string{},
+		"skip resources that match a YAML path and regex",
 	)
 	disableIgnoreChecksAnnotation := fs.Bool(
 		"disable-ignore-checks-annotations",
@@ -224,6 +234,7 @@ Use "-" as filename to read from STDIN.`, execName(binName))
 		filesToRead,
 		exitOneOnWarning,
 		skipInitContainers,
+		skipJobs,
 		namespace,
 		ignoreContainerCpuLimit,
 		ignoreContainerMemoryLimit,
@@ -234,6 +245,7 @@ Use "-" as filename to read from STDIN.`, execName(binName))
 		color,
 		optionalTests,
 		ignoreTests,
+		skipExpressions,
 		disableIgnoreChecksAnnotation,
 		disableOptionalChecksAnnotation,
 		allDefaultOptional,
@@ -245,6 +257,7 @@ type Options struct {
 	filesToRead                     []string
 	exitOneOnWarning                *bool
 	skipInitContainers              *bool
+	skipJobs                        *bool
 	namespace                       *string
 	ignoreContainerCpuLimit         *bool
 	ignoreContainerMemoryLimit      *bool
@@ -255,6 +268,7 @@ type Options struct {
 	color                           *string
 	optionalTests                   *[]string
 	ignoreTests                     *[]string
+	skipExpressions                 *[]string
 	disableIgnoreChecksAnnotation   *bool
 	disableOptionalChecksAnnotation *bool
 	allDefaultOptional              *bool
@@ -300,9 +314,19 @@ func run(opts Options) error {
 		return errors.New("invalid --kubernetes-version. Use on format \"vN.NN\"")
 	}
 
+	var skipExpressions []*config.SkipExpression
+	for _, rawExpr := range *opts.skipExpressions {
+		skipExpr, err := config.ParseSkipExpression(rawExpr)
+		if err != nil {
+			return fmt.Errorf("invalid skip expression: %w", err)
+		}
+		skipExpressions = append(skipExpressions, skipExpr)
+	}
+
 	runConfig := &config.RunConfiguration{
 		Namespace:                             *opts.namespace,
 		SkipInitContainers:                    *opts.skipInitContainers,
+		SkipJobs:                              *opts.skipJobs,
 		IgnoreContainerCpuLimitRequirement:    *opts.ignoreContainerCpuLimit,
 		IgnoreContainerMemoryLimitRequirement: *opts.ignoreContainerMemoryLimit,
 		EnabledOptionalTests:                  enabledOptionalTests,
@@ -321,7 +345,8 @@ func run(opts Options) error {
 		}
 	}
 	p, err := parser.New(&parser.Config{
-		VerboseOutput: *opts.verboseOutput,
+		VerboseOutput:   *opts.verboseOutput,
+		SkipExpressions: skipExpressions,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to initializer parser: %w", err)
