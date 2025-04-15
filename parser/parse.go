@@ -351,6 +351,9 @@ func (p *Parser) decodeItem(
 		fileLocation.Skip = p.isSkipped(&job, errs)
 
 		// set job name for pods from
+		if job.Spec.Template.Labels == nil {
+			job.Spec.Template.Labels = make(map[string]string)
+		}
 		job.Spec.Template.Labels["job-name"] = job.Name
 
 		j := internal.Batchv1Job{Job: job, Location: fileLocation}
