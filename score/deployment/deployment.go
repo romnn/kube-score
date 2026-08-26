@@ -2,6 +2,7 @@ package deployment
 
 import (
 	"fmt"
+
 	ks "github.com/romnn/kube-score/domain"
 	"github.com/romnn/kube-score/score/checks"
 	"github.com/romnn/kube-score/score/internal"
@@ -171,7 +172,7 @@ func deploymentReplicas(
 				"",
 			)
 		default:
-			if ptr.Deref(deployment.Spec.Replicas, 1) >= int32(options.MinReplicas) {
+			if int(ptr.Deref(deployment.Spec.Replicas, 1)) >= options.MinReplicas {
 				score.Grade = scorecard.GradeAllOK
 			} else {
 				score.Grade = scorecard.GradeWarning

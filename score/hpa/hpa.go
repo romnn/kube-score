@@ -82,7 +82,7 @@ func hpaHasMultipleReplicas(
 	options Options,
 ) func(hpa domain.HpaTargeter) (score scorecard.TestScore, err error) {
 	return func(hpa domain.HpaTargeter) (score scorecard.TestScore, err error) {
-		if ptr.Deref(hpa.MinReplicas(), 1) >= int32(options.MinReplicas) {
+		if int(ptr.Deref(hpa.MinReplicas(), 1)) >= options.MinReplicas {
 			score.Grade = scorecard.GradeAllOK
 		} else {
 			score.Grade = scorecard.GradeWarning

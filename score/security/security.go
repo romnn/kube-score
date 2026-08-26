@@ -207,7 +207,7 @@ func podSeccompProfile(options Options) func(ps ks.PodSpecer) (score scorecard.T
 			}
 		}
 
-		//Check if seccomp is set via securityContext at Pod or Container Level
+		// Check if seccomp is set via securityContext at Pod or Container Level
 		if !secured {
 			elements := make(map[string]bool)
 			if ps.GetPodTemplateSpec().Spec.SecurityContext != nil && ps.GetPodTemplateSpec().Spec.SecurityContext.SeccompProfile != nil {
