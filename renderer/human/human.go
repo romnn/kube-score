@@ -70,17 +70,22 @@ func Human(
 		// Display file name if the object has any warnings or criticals
 		if scoredObject.AnyBelowOrEqualToGrade(scorecard.GradeWarning) {
 			if scoredObject.FileLocation.Name != "" {
-				_, _ = color.New(color.FgHiBlack).
-					Fprintf(w, "    path=%s\n", scoredObject.FileLocation.Name)
+				fprintlnColor(
+					w,
+					color.FgHiBlack,
+					"    path=%s",
+					scoredObject.FileLocation.Name,
+				)
 			}
 		}
 
 		if scoredObject.FileLocation.Skip {
 			if verboseOutput >= 2 {
 				// Only print skipped files if verbosity is at least 2
-				color.New(color.FgGreen).Fprintf(
+				fprintlnColor(
 					w,
-					"    [SKIPPED] %s#L%d\n",
+					color.FgGreen,
+					"    [SKIPPED] %s#L%d",
 					scoredObject.FileLocation.Name,
 					scoredObject.FileLocation.Line,
 				)
@@ -131,9 +136,9 @@ func outputHumanStep(
 	}
 
 	if card.Skipped {
-		color.New(col).Fprintf(w, "    [SKIPPED] %s\n", card.Check.Name)
+		fprintlnColor(w, col, "    [SKIPPED] %s", card.Check.Name)
 	} else {
-		color.New(col).Fprintf(w, "    [%s] %s\n", card.Grade.String(), card.Check.Name)
+		fprintlnColor(w, col, "    [%s] %s", card.Grade.String(), card.Check.Name)
 	}
 
 	for _, comment := range card.Comments {
@@ -170,6 +175,15 @@ func outputHumanStep(
 	}
 
 	return w
+}
+
+// fprintlnColor writes format in attr, followed by an uncolored newline.
+//
+// The reset has to land before the newline. Consumers that split the stream
+// into lines — a task runner prefixing each line, for example — otherwise
+// carry the still-open color into the start of the next line.
+func fprintlnColor(w io.Writer, attr color.Attribute, format string, a ...any) {
+	_, _ = fmt.Fprintf(w, "%s\n", color.New(attr).Sprintf(format, a...))
 }
 
 func safeRepeat(s string, count int) string {

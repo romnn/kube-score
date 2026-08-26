@@ -2,8 +2,11 @@ package human
 
 import (
 	"io"
+	"regexp"
+	"strings"
 	"testing"
 
+	"github.com/fatih/color"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -459,4 +462,38 @@ func TestHumanOutputWithLongObjectNames(t *testing.T) {
 `,
 		string(all),
 	)
+}
+
+var sgrPattern = regexp.MustCompile(`\x1b\[[0-9;]*m`)
+
+// Every colored line has to reset before its newline. A consumer that splits
+// the stream and prefixes each line renders the next prefix in the previous
+// line's color when the reset lands on the wrong side of the break.
+func TestHumanOutputResetsColorBeforeNewline(t *testing.T) {
+	// Not parallel: Human writes the package-global color.NoColor.
+	previous := color.NoColor
+	t.Cleanup(func() { color.NoColor = previous })
+
+	r, err := Human(getTestCard(), 2, 100, true)
+	assert.Nil(t, err)
+	all, err := io.ReadAll(r)
+	assert.Nil(t, err)
+
+	output := string(all)
+	assert.Contains(t, output, "\x1b[", "expected colored output")
+
+	for index, line := range strings.Split(strings.TrimSuffix(output, "\n"), "\n") {
+		codes := sgrPattern.FindAllString(line, -1)
+		if len(codes) == 0 {
+			continue
+		}
+		assert.Equal(
+			t,
+			"\x1b[0m",
+			codes[len(codes)-1],
+			"line %d leaves a color open across the newline: %q",
+			index+1,
+			line,
+		)
+	}
 }
